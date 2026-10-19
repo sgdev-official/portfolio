@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Open-Source MAS Generates Permanent HWID Licenses | SGDEV Labs</title>
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --border: #334155;
+    --text: #f8fafc; --muted: #94a3b8; --accent: #38bdf8;
+    --code-bg: #020617;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Tahoma, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  .navbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 5%; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+  .logo span { color: var(--accent); }
+  .back { color: var(--muted); }
+  .back:hover { color: var(--accent); }
+
+  main { max-width: 800px; margin: 3rem auto; padding: 0 1rem; }
+
+  .tag {
+    display: inline-block; margin-bottom: .8rem;
+    font-size: .75rem; font-weight: 700; text-transform: uppercase;
+    background: #0284c7; color: #f0f9ff;
+    padding: .2rem .6rem; border-radius: 4px;
+  }
+  h1 { font-size: clamp(1.6rem, 4vw, 2.1rem); line-height: 1.3; margin-bottom: .5rem; }
+  .meta { color: #64748b; font-size: .85rem; margin-bottom: 1.5rem; }
+  h2 {
+    font-size: 1.4rem; margin: 2.5rem 0 .8rem;
+    padding-bottom: .4rem; border-bottom: 2px solid var(--border);
+  }
+  p { color: var(--muted); margin-bottom: 1rem; }
+  ul { color: var(--muted); margin: 0 0 1rem 1.2rem; }
+  li { margin-bottom: .4rem; }
+
+  .disclaimer-card {
+    background: #0f2942;
+    border: 1px solid #0284c7;
+    border-left: 4px solid #38bdf8;
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .disclaimer-card h4 { color: #38bdf8; margin-bottom: .4rem; font-size: .95rem; }
+  .disclaimer-card p { color: #bae6fd; font-size: .85rem; margin: 0; }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+  code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    color: #38bdf8;
+    font-size: .9rem;
+  }
+
+  .comparison-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.2rem;
+    border-radius: 6px;
+    margin: 1.2rem 0;
+  }
+  .comparison-box h3 { font-size: 1.1rem; color: var(--accent); margin-bottom: .4rem; }
+
+  footer {
+    background: #020617; border-top: 1px solid var(--surface);
+    padding: 2rem 1rem; margin-top: 4rem;
+    text-align: center; font-size: .85rem; color: #64748b;
+  }
+</style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="index.html" class="logo">SGDEV<span>.qd.je</span></a>
+    <a href="index.html#articles" class="back">← All Articles</a>
+  </header>
+
+  <main>
+    <span class="tag">Windows & Security</span>
+    <h1>How Open-Source MAS Generates Permanent HWID Licenses</h1>
+    <p class="meta">Technical Systems Research · by Shubhomoy (sgdev) · October 2026</p>
+
+    <div class="disclaimer-card">
+      <h4>📌 Educational Research & Reverse Engineering Analysis</h4>
+      <p>This technical article analyzes Windows licensing mechanics, Hardware Hashes (HWID), and digital entitlement workflows. Microsoft, Windows, and related branding are trademarks of Microsoft Corp. This analysis is conducted strictly for educational, security, and open-source system internals research.</p>
+    </div>
+
+    <h2>1. Introduction: Digital Entitlement vs. Product Keys</h2>
+    <p>Windows 10 and 11 shifted traditional activation away from manual 25-character product keys toward a cloud-bound mechanism known as <strong>Digital Entitlement (HWID)</strong>. Open-source tools like <strong>Microsoft Activation Scripts (MAS)</strong> leverage native system APIs to request genuine hardware licenses directly from Microsoft Activation Servers.</p>
+
+    <h2>2. Technical Mechanism: HWID vs. Legacy KMS</h2>
+
+    <div class="comparison-box">
+      <h3>KMS Activation (Legacy Method)</h3>
+      <p>KMS (Key Management Service) routes activation tickets through a local or external KMS emulator server. It flags system status as <em>"Activated using your organization's service"</em> and requires mandatory re-activation every 180 days.</p>
+    </div>
+
+    <div class="comparison-box">
+      <h3>HWID Activation (MAS Open-Source Method)</h3>
+      <p>HWID scripts trigger the official Windows 7/8 to 10/11 upgrade ticket generation pipeline (<code>gatherosstate.exe</code> logic). It extracts system hardware hash components (Motherboard UUID, CPU ID, MAC Address) and registers a permanent digital license directly on Microsoft Licensing Servers.</p>
+    </div>
+
+    <h2>3. The HWID License Generation Lifecycle</h2>
+    <ol style="color: var(--muted); margin-left: 1.5rem; margin-bottom: 1rem;">
+      <li><strong>Hardware Hash Compilation:</strong> The script reads hardware UUID metrics without modifying OS kernel files.</li>
+      <li><strong>Genuine Ticket Creation:</strong> A valid activation XML ticket is constructed using native system binaries.</li>
+      <li><strong>Server Registration:</strong> The ticket is dispatched to Microsoft's official activation endpoint.</li>
+      <li><strong>Cloud Binding:</strong> The hardware hash is permanently linked to the device motherboard ID in Microsoft's database.</li>
+    </ol>
+
+    <h2>4. Key Benefits of Permanent HWID</h2>
+    <ul>
+      <li><strong>Format-Proof:</strong> Complete disk wipes and clean Windows reinstalls re-activate automatically upon connecting to the internet.</li>
+      <li><strong>Zero Background Services:</strong> No third-party EXEs, background daemons, or modified system files reside on the PC.</li>
+      <li><strong>Account Linkage:</strong> The entitlement attaches automatically to signed-in Microsoft accounts.</li>
+    </ul>
+
+    <h2>5. Conclusion</h2>
+    <p>Understanding MAS HWID activation demonstrates how modern OS licensing relies on cloud-stored hardware signatures rather than local key verification. Analyzing these open-source scripts highlights the elegant intersection of system security, cloud authentication, and hardware identity.</p>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 SGDEV Labs · Systems & Security Research · <code>info@sgdev.qd.je</code></p>
+  </footer>
+
+</body>
+</html>
