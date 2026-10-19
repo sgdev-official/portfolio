@@ -1,110 +1,238 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGDEV Tech Labs & Research</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGDEV Tech Labs & Research</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --border: #334155;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Tahoma, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* Header */
+  .navbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 5%;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { font-size: 1.4rem; font-weight: 700; }
+  .logo span { color: var(--accent); }
+  nav ul { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
+  nav a { color: var(--muted); transition: color .2s; }
+  nav a:hover { color: var(--accent); }
+  nav .btn-contact {
+    background: #0284c7; color: #fff;
+    padding: .4rem 1rem; border-radius: 6px;
+  }
+  nav .btn-contact:hover { color: #fff; background: #0369a1; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 4rem 1rem;
+    background: linear-gradient(180deg, var(--surface), var(--bg));
+  }
+  .hero h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin-bottom: 1rem; }
+  .hero p { color: var(--muted); font-size: 1.1rem; margin-bottom: 1.5rem; }
+  .btn-primary {
+    display: inline-block;
+    background: var(--accent); color: var(--bg);
+    padding: .75rem 1.5rem; border-radius: 6px; font-weight: 700;
+    transition: background .2s;
+  }
+  .btn-primary:hover { background: #7dd3fc; }
+
+  /* Sections */
+  section.content { max-width: 1100px; margin: 3rem auto; padding: 0 1rem; }
+  section.content h2 {
+    font-size: 1.8rem; margin-bottom: 2rem;
+    padding-bottom: .5rem; border-bottom: 2px solid var(--border);
+  }
+
+  /* Cards */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    display: flex; flex-direction: column; justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 1.5rem;
+    transition: transform .2s, border-color .2s;
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .card.highlight { border-color: #ef4444; }
+
+  .tag {
+    width: fit-content; margin-bottom: .8rem;
+    font-size: .75rem; font-weight: 700; text-transform: uppercase;
+    background: #0369a1; color: #e0f2fe;
+    padding: .2rem .6rem; border-radius: 4px;
+  }
+  .tag.warning { background: #991b1b; color: #fef2f2; }
+
+  .card h3 { font-size: 1.15rem; margin-bottom: .6rem; }
+  .card p { color: var(--muted); font-size: .9rem; margin-bottom: 1.2rem; }
+
+  .card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: .8rem; color: #64748b;
+    border-top: 1px solid var(--border); padding-top: .8rem;
+  }
+  .read-more { color: var(--accent); font-weight: 700; }
+
+  /* About */
+  .about p { color: var(--muted); max-width: 700px; }
+
+  /* Footer */
+  footer {
+    background: #020617;
+    border-top: 1px solid var(--surface);
+    padding: 2rem 1rem; margin-top: 4rem;
+  }
+  .disclaimer-box {
+    max-width: 900px; margin: 0 auto 1.5rem;
+    background: var(--bg);
+    border-left: 4px solid var(--accent);
+    padding: 1rem; border-radius: 4px;
+  }
+  .disclaimer-box h4 { margin-bottom: .4rem; color: #e2e8f0; }
+  .disclaimer-box p { font-size: .85rem; color: #64748b; }
+  .footer-bottom { text-align: center; font-size: .85rem; color: #64748b; }
+  code {
+    background: var(--surface); color: var(--accent);
+    padding: .2rem .4rem; border-radius: 4px;
+  }
+
+  @media (max-width: 600px) {
+    .navbar { flex-direction: column; gap: .6rem; }
+    nav ul { gap: 1rem; }
+  }
+</style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
-    <header class="navbar">
-        <div class="logo">
-            <a href="#">SGDEV<span>.qd.je</span></a>
+  <header class="navbar">
+    <a href="#home" class="logo">SGDEV<span>.qd.je</span></a>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#articles">Articles</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="mailto:info@sgdev.qd.je" class="btn-contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero" id="home">
+    <h1>Open-Source Software & Network Telemetry Research</h1>
+    <p>System internals, open-source tools, and cellular network analysis.</p>
+    <a href="#articles" class="btn-primary">Explore Articles</a>
+  </section>
+
+  <section class="content" id="articles">
+    <h2>Latest Technical Studies</h2>
+    <div class="grid">
+
+      <article class="card">
+        <div>
+          <span class="tag">Windows & Security</span>
+          <h3>How Open-Source MAS Generates Permanent HWID Licenses</h3>
+          <p>A deep dive into Microsoft Activation Scripts, hardware hashes, and the technical difference between HWID and KMS activation.</p>
         </div>
-        <nav>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#articles">Articles</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="mailto:info@sgdev.qd.je" class="btn-contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1>Open-Source Software & Network Telemetry Research</h1>
-            <p>System Internals, Open-Source Tools, and Cellular Network Analysis.</p>
-            <a href="#articles" class="btn-primary">Explore Articles</a>
+        <div class="card-footer">
+          <span>Educational Use</span>
+          <a href="#" class="read-more">Read Paper →</a>
         </div>
-    </section>
+      </article>
 
-    <!-- Articles Section -->
-    <section class="articles-container" id="articles">
-        <h2>Latest Technical Studies</h2>
-        <div class="grid">
-
-            <!-- Card 1: MAS HWID Activation -->
-            <article class="card">
-                <span class="tag">Windows & Security</span>
-                <h3>How Open-Source MAS Generates Permanent HWID Licenses</h3>
-                <p>A deep dive into Microsoft Activation Scripts, Hardware Hashes, and the technical difference between HWID and KMS activation.</p>
-                <div class="card-footer">
-                    <span>Educational Use</span>
-                    <a href="#" class="read-more">Read Paper →</a>
-                </div>
-            </article>
-
-            <!-- Card 2: Free MS Office via Open Source -->
-            <article class="card">
-                <span class="tag">Productivity</span>
-                <h3>Deploying Microsoft Office via C2R & MAS Verification</h3>
-                <p>Understanding Click-to-Run deployment architecture and activating productivity suites legally for research purposes.</p>
-                <div class="card-footer">
-                    <span>Educational Use</span>
-                    <a href="#" class="read-more">Read Paper →</a>
-                </div>
-            </article>
-
-            <!-- Card 3: Photoshop Alternatives -->
-            <article class="card">
-                <span class="tag">Open Source</span>
-                <h3>Top Open-Source Alternatives to Adobe Photoshop in 2026</h3>
-                <p>Evaluating high-performance raster graphics editors like GIMP and Krita for professional workflows without telemetry.</p>
-                <div class="card-footer">
-                    <span>Software Audit</span>
-                    <a href="#" class="read-more">Read Paper →</a>
-                </div>
-            </article>
-
-            <!-- Card 4: SKLauncher & Minecraft -->
-            <article class="card">
-                <span class="tag">Gaming & Systems</span>
-                <h3>Optimizing Java Edition Minecraft via SKLauncher</h3>
-                <p>Configuring offline mode authentication, custom JVM flags, and runtime allocation for low-end hardware.</p>
-                <div class="card-footer">
-                    <span>Gaming Architecture</span>
-                    <a href="#" class="read-more">Read Paper →</a>
-                </div>
-            </article>
-
-            <!-- Card 5: Airtel Network Analysis (Main Case Study) -->
-            <article class="card highlight">
-                <span class="tag warning">Network Telemetry</span>
-                <h3>Airtel 5G NSA Analysis & LTE Band Masking Technical Report</h3>
-                <p>Examining LTE 1800 (Band 3) anchor channel masking, NetMonster radio metrics, and non-standalone 5G deployment dynamics.</p>
-                <div class="card-footer">
-                    <span>Research Case Study</span>
-                    <a href="#" class="read-more">Read Report →</a>
-                </div>
-            </article>
-
+      <article class="card">
+        <div>
+          <span class="tag">Productivity</span>
+          <h3>Deploying Microsoft Office via C2R & MAS Verification</h3>
+          <p>Understanding Click-to-Run deployment architecture and how activation is verified for research purposes.</p>
         </div>
-    </section>
+        <div class="card-footer">
+          <span>Educational Use</span>
+          <a href="#" class="read-more">Read Paper →</a>
+        </div>
+      </article>
 
-    <!-- Legal & Educational Disclaimer Footer -->
-    <footer>
-        <div class="disclaimer-box">
-            <h4>📌 Fair Use & Educational Disclaimer</h4>
-            <p>All content published on <strong>sgdev.qd.je</strong> is intended strictly for educational, research, and technical analysis purposes under Fair Use guidelines. No copyrighted binaries or illegal software are hosted on this infrastructure.</p>
+      <article class="card">
+        <div>
+          <span class="tag">Open Source</span>
+          <h3>Top Open-Source Alternatives to Adobe Photoshop in 2026</h3>
+          <p>Evaluating high-performance raster graphics editors like GIMP and Krita for professional workflows without telemetry.</p>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 SGDEV Labs. Developed by Shubhomoy. Contact: <code>info@sgdev.qd.je</code></p>
+        <div class="card-footer">
+          <span>Software Audit</span>
+          <a href="#" class="read-more">Read Paper →</a>
         </div>
-    </footer>
+      </article>
+
+      <article class="card">
+        <div>
+          <span class="tag">Gaming & Systems</span>
+          <h3>Optimizing Java Edition Minecraft via SKLauncher</h3>
+          <p>Configuring offline mode authentication, custom JVM flags, and runtime allocation for low-end hardware.</p>
+        </div>
+        <div class="card-footer">
+          <span>Gaming Architecture</span>
+          <a href="#" class="read-more">Read Paper →</a>
+        </div>
+      </article>
+
+      <article class="card highlight">
+        <div>
+          <span class="tag warning">Network Telemetry</span>
+          <h3>Airtel 5G NSA Analysis & LTE Band Masking Technical Report</h3>
+          <p>Examining LTE 1800 (Band 3) anchor channel masking, NetMonster radio metrics, and non-standalone 5G deployment dynamics.</p>
+        </div>
+        <div class="card-footer">
+          <span>Research Case Study</span>
+          <a href="#" class="read-more">Read Report →</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="content about" id="about">
+    <h2>About</h2>
+    <p>SGDEV Labs publishes technical write-ups on system internals, open-source software, and cellular network telemetry. Developed by Shubhomoy.</p>
+  </section>
+
+  <footer>
+    <div class="disclaimer-box">
+      <h4>📌 Educational Disclaimer</h4>
+      <p>All content on <strong>sgdev.qd.je</strong> is intended for educational, research, and technical analysis purposes. No copyrighted binaries are hosted on this site.</p>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SGDEV Labs · <code>info@sgdev.qd.je</code></p>
+    </div>
+  </footer>
 
 </body>
 </html>
