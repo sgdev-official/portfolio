@@ -58,7 +58,7 @@
   /* ---------- 2. Active nav + scroll progress (one throttled handler) ---------- */
   var links = {};
   document.querySelectorAll(".nb[data-s]").forEach(function (a) { links[a.dataset.s] = a; });
-  var ids = ["top", "about", "projects", "tools", "contact"];
+  var ids = ["top", "about", "projects", "tools", "arcade", "contact"];
   var bar = $("progress"), upBtn = $("up"), ticking = false;
   function onScroll() {
     ticking = false;
@@ -267,22 +267,25 @@
 
   /* ---------- 6. Tabs, SHA-256, password generator ---------- */
   (function () {
-    var tabs = Array.prototype.slice.call(document.querySelectorAll(".tabs [role=tab]"));
-    function select(t) {
-      tabs.forEach(function (x) {
-        var on = x === t;
-        x.setAttribute("aria-selected", String(on));
-        x.tabIndex = on ? 0 : -1;
-        $(x.getAttribute("aria-controls")).hidden = !on;
-      });
-      t.focus();
-    }
-    tabs.forEach(function (t, i) {
-      t.addEventListener("click", function () { select(t); });
-      t.addEventListener("keydown", function (e) {
-        var n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : null;
-        if (n === null) return;
-        e.preventDefault(); select(tabs[(n + tabs.length) % tabs.length]);
+    document.querySelectorAll(".tabs").forEach(function (group) {
+      var tabs = Array.prototype.slice.call(group.querySelectorAll("[role=tab]"));
+      function select(t) {
+        tabs.forEach(function (x) {
+          var on = x === t;
+          x.setAttribute("aria-selected", String(on));
+          x.tabIndex = on ? 0 : -1;
+          $(x.getAttribute("aria-controls")).hidden = !on;
+        });
+        t.focus();
+        document.dispatchEvent(new CustomEvent("tabsel", { detail: t.dataset.t }));
+      }
+      tabs.forEach(function (t, i) {
+        t.addEventListener("click", function () { select(t); });
+        t.addEventListener("keydown", function (e) {
+          var n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : null;
+          if (n === null) return;
+          e.preventDefault(); select(tabs[(n + tabs.length) % tabs.length]);
+        });
       });
     });
 
@@ -325,6 +328,296 @@
       ["pu", "pn", "ps"].forEach(function (id) { $(id).addEventListener("change", gen); });
       gen();
     }
+  })();
+
+  /* ---------- 6b. Arcade: Tic-Tac-Toe, Memory, Reaction, Snake, Typing ---------- */
+  (function () {
+    var rand = function (n) { return Math.floor(Math.random() * n); };
+    var num = function (k) { return parseInt(store(k), 10) || 0; };
+    function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = rand(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+    /* ----- Tic-Tac-Toe (minimax AI) ----- */
+    (function () {
+      var boardEl = $("ttt"); if (!boardEl) return;
+      var b, turn, over = false, first = "X", mode = "hard", token = 0, sc = { w: 0, d: 0, l: 0 }, cells = [];
+      var stat = $("tstat");
+
+      /*ttt-ai*/
+      var L = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      function win(bd) {
+        for (var i = 0; i < 8; i++) {
+          var l = L[i];
+          if (bd[l[0]] && bd[l[0]] === bd[l[1]] && bd[l[0]] === bd[l[2]]) return { p: bd[l[0]], l: l };
+        }
+        return null;
+      }
+      function mm(bd, p, d) {
+        var w = win(bd);
+        if (w) return w.p === "O" ? 10 - d : d - 10;
+        if (bd.every(Boolean)) return 0;
+        var best = p === "O" ? -99 : 99;
+        for (var i = 0; i < 9; i++) if (!bd[i]) {
+          bd[i] = p;
+          var v = mm(bd, p === "O" ? "X" : "O", d + 1);
+          bd[i] = "";
+          best = p === "O" ? Math.max(best, v) : Math.min(best, v);
+        }
+        return best;
+      }
+      function aiPick(bd, md) {
+        var e = [], i;
+        for (i = 0; i < 9; i++) if (!bd[i]) e.push(i);
+        if (md === "easy" && Math.random() < 0.55) return e[rand(e.length)];
+        var best = -99, pick = [];
+        e.forEach(function (m) {
+          bd[m] = "O"; var v = mm(bd, "X", 1); bd[m] = "";
+          if (v > best) { best = v; pick = [m]; } else if (v === best) pick.push(m);
+        });
+        return pick[rand(pick.length)];
+      }
+      /*end-ttt-ai*/
+
+      for (var k = 0; k < 9; k++) (function (i) {
+        var c = document.createElement("button");
+        c.type = "button"; c.className = "cell";
+        c.setAttribute("aria-label", "Row " + (Math.floor(i / 3) + 1) + ", column " + (i % 3 + 1));
+        c.addEventListener("click", function () { play(i); });
+        boardEl.appendChild(c); cells.push(c);
+      })(k);
+
+      function labels() { $("l1").textContent = mode === "2p" ? "X" : "You"; $("l3").textContent = mode === "2p" ? "O" : "AI"; }
+      function scores() { $("sw").textContent = sc.w; $("sd").textContent = sc.d; $("sl").textContent = sc.l; }
+      function render(w) {
+        cells.forEach(function (c, i) {
+          c.textContent = b[i]; c.dataset.m = b[i];
+          c.classList.toggle("win", !!w && w.l.indexOf(i) > -1);
+        });
+      }
+      function say() {
+        if (over) return;
+        stat.textContent = mode === "2p" ? turn + " to play" : turn === "X" ? "Your turn (X)" : "AI is thinking…";
+      }
+      function check() {
+        var w = win(b); render(w);
+        if (!w && !b.every(Boolean)) return false;
+        over = true;
+        if (!w) { sc.d++; stat.textContent = "It's a draw"; }
+        else if (mode === "2p") { if (w.p === "X") sc.w++; else sc.l++; stat.textContent = w.p + " wins!"; }
+        else if (w.p === "X") { sc.w++; stat.textContent = "You win! 🎉"; }
+        else { sc.l++; stat.textContent = "The AI wins. Try again?"; }
+        scores();
+        return true;
+      }
+      function aiTurn() {
+        var t = token; say();
+        setTimeout(function () {
+          if (t !== token || over) return;
+          b[aiPick(b, mode)] = "O";
+          if (!check()) { turn = "X"; say(); }
+        }, 380);
+      }
+      function play(i) {
+        if (over || b[i] || (mode !== "2p" && turn !== "X")) return;
+        b[i] = turn;
+        if (check()) return;
+        turn = turn === "X" ? "O" : "X";
+        if (mode !== "2p") aiTurn(); else say();
+      }
+      function reset(flip) {
+        token++; b = ["", "", "", "", "", "", "", "", ""]; over = false;
+        if (flip) first = first === "X" ? "O" : "X";
+        turn = first;
+        render(null); labels(); say();
+        if (mode !== "2p" && turn === "O") aiTurn();
+      }
+      $("tmode").addEventListener("click", function (e) {
+        var bt = e.target.closest("button"); if (!bt) return;
+        mode = bt.dataset.m;
+        Array.prototype.forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === bt)); });
+        sc = { w: 0, d: 0, l: 0 }; first = "X"; scores(); reset(false);
+      });
+      $("tnew").addEventListener("click", function () { reset(over); });
+      scores(); reset(false);
+    })();
+
+    /* ----- Memory match ----- */
+    (function () {
+      var grid = $("mem"); if (!grid) return;
+      var icons = ["🐍", "⚡", "🔒", "🚀", "🧠", "🔥", "🎯", "💡"];
+      var deck, cards, open, moves, matched, lock, best = num("sg-mem"), stat = $("mstat");
+      function info(extra) { stat.textContent = "Moves: " + moves + (best ? " · Best: " + best : "") + (extra || ""); }
+      function setup() {
+        deck = shuffle(icons.concat(icons)); cards = []; open = []; moves = 0; matched = 0; lock = false;
+        grid.textContent = "";
+        deck.forEach(function (ic, i) {
+          var c = document.createElement("button");
+          c.type = "button"; c.className = "mc"; c.textContent = "?";
+          c.setAttribute("aria-label", "Card " + (i + 1));
+          c.addEventListener("click", function () { flip(i); });
+          grid.appendChild(c); cards.push(c);
+        });
+        info();
+      }
+      function show(i, on) {
+        cards[i].classList.toggle("up", on);
+        cards[i].textContent = on ? deck[i] : "?";
+        cards[i].setAttribute("aria-label", on ? deck[i] : "Card " + (i + 1));
+      }
+      function flip(i) {
+        var c = cards[i];
+        if (lock || c.classList.contains("up") || c.classList.contains("done")) return;
+        show(i, true); open.push(i);
+        if (open.length < 2) return;
+        moves++;
+        var a = open[0], z = open[1];
+        if (deck[a] === deck[z]) {
+          [a, z].forEach(function (x) { cards[x].classList.remove("up"); cards[x].classList.add("done"); });
+          open = []; matched++;
+          if (matched === icons.length) {
+            if (!best || moves < best) { best = moves; store("sg-mem", String(best)); info(" · New best! 🎉"); } else info(" · Done!");
+            return;
+          }
+        } else {
+          lock = true;
+          setTimeout(function () { show(a, false); show(z, false); open = []; lock = false; }, 800);
+        }
+        info();
+      }
+      $("mnew").addEventListener("click", setup);
+      setup();
+    })();
+
+    /* ----- Reaction test ----- */
+    (function () {
+      var area = $("rarea"); if (!area) return;
+      var st = "idle", t0 = 0, tm = 0, times = [], best = num("sg-react"), stat = $("rstat");
+      function setState(s, text, cls) { st = s; area.textContent = text; area.className = "rarea" + (cls ? " " + cls : ""); }
+      function stats(last) {
+        var avg = Math.round(times.reduce(function (a, c) { return a + c; }, 0) / times.length);
+        stat.textContent = "Last: " + last + " ms · Average: " + avg + " ms · Best: " + best + " ms";
+      }
+      function go() { t0 = performance.now(); setState("go", "Click now!", "go"); }
+      function hit() {
+        if (st === "idle") { setState("wait", "Wait for the colour…", "wait"); tm = setTimeout(go, 1500 + rand(2500)); }
+        else if (st === "wait") { clearTimeout(tm); setState("idle", "Too soon! Click to try again"); }
+        else if (st === "go") {
+          var ms = Math.round(performance.now() - t0);
+          times.push(ms);
+          if (!best || ms < best) { best = ms; store("sg-react", String(ms)); }
+          setState("idle", ms + " ms · click to go again"); stats(ms);
+        }
+      }
+      area.addEventListener("pointerdown", function (e) { e.preventDefault(); hit(); });
+      area.addEventListener("click", function (e) { if (e.detail === 0) hit(); });   /* keyboard */
+      document.addEventListener("tabsel", function () { clearTimeout(tm); if (st !== "idle") setState("idle", "Click to start"); });
+    })();
+
+    /* ----- Snake ----- */
+    (function () {
+      var cv = $("sc"); if (!cv) return;
+      var ctx = cv.getContext("2d"), N = 15, S = cv.width / N, state = "idle", snake, dir, nd, food, score = 0, timer = 0;
+      var best = num("sg-snake"), col = "#ffe21a", stat = $("sstat"), btn = $("sgo"), panel = $("p-snake");
+      function info() { stat.textContent = "Score: " + score + " · Best: " + best; }
+      function place() { do { food = { x: rand(N), y: rand(N) }; } while (snake.some(function (p) { return p.x === food.x && p.y === food.y; })); }
+      function reset() { snake = [{ x: 7, y: 7 }, { x: 6, y: 7 }, { x: 5, y: 7 }]; dir = { x: 1, y: 0 }; nd = dir; score = 0; place(); }
+      function draw(msg) {
+        ctx.fillStyle = "#0a0a0a"; ctx.fillRect(0, 0, cv.width, cv.height);
+        ctx.fillStyle = "#141414";
+        for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) if ((i + j) % 2) ctx.fillRect(i * S, j * S, S, S);
+        ctx.fillStyle = "#f5f5f0"; ctx.beginPath(); ctx.arc(food.x * S + S / 2, food.y * S + S / 2, S * 0.33, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = col;
+        snake.forEach(function (p, n) { ctx.globalAlpha = n ? 0.85 : 1; ctx.fillRect(p.x * S + 1, p.y * S + 1, S - 2, S - 2); });
+        ctx.globalAlpha = 1;
+        if (msg) {
+          ctx.fillStyle = "rgba(0,0,0,.62)"; ctx.fillRect(0, 0, cv.width, cv.height);
+          ctx.fillStyle = "#fff"; ctx.font = "700 20px Inter, system-ui, sans-serif"; ctx.textAlign = "center";
+          ctx.fillText(msg, cv.width / 2, cv.height / 2 + 7);
+        }
+      }
+      function schedule() { clearInterval(timer); timer = setInterval(tick, Math.max(65, 140 - score * 4)); }
+      function over() {
+        clearInterval(timer); state = "over";
+        if (score > best) { best = score; store("sg-snake", String(best)); }
+        btn.textContent = "Play again"; info(); draw("Game over");
+      }
+      function tick() {
+        dir = nd;
+        var h = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+        if (h.x < 0 || h.y < 0 || h.x >= N || h.y >= N ||
+            snake.some(function (p, i) { return i < snake.length - 1 && p.x === h.x && p.y === h.y; })) return over();
+        snake.unshift(h);
+        if (h.x === food.x && h.y === food.y) { score++; place(); schedule(); } else snake.pop();
+        info(); draw();
+      }
+      function pause() { if (state !== "run") return; clearInterval(timer); state = "pause"; btn.textContent = "Resume"; draw("Paused"); }
+      function toggle() {
+        if (state === "run") { pause(); return; }
+        if (state === "idle" || state === "over") { reset(); col = getComputedStyle(root).getPropertyValue("--y").trim() || col; }
+        state = "run"; btn.textContent = "Pause"; info(); draw(); schedule();
+      }
+      function steer(x, y) { if (state !== "run" || (x === -dir.x && y === -dir.y)) return; nd = { x: x, y: y }; }
+      var keys = { ArrowUp: [0, -1], w: [0, -1], W: [0, -1], ArrowDown: [0, 1], s: [0, 1], S: [0, 1], ArrowLeft: [-1, 0], a: [-1, 0], A: [-1, 0], ArrowRight: [1, 0], d: [1, 0], D: [1, 0] };
+      panel.addEventListener("keydown", function (e) {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (keys[e.key]) { steer(keys[e.key][0], keys[e.key][1]); e.preventDefault(); }
+        else if (e.key === " " && e.target === cv) { toggle(); e.preventDefault(); }
+      });
+      btn.addEventListener("click", function () { toggle(); cv.focus({ preventScroll: true }); });
+      var sx = 0, sy = 0;
+      cv.addEventListener("pointerdown", function (e) { sx = e.clientX; sy = e.clientY; });
+      cv.addEventListener("pointerup", function (e) {
+        var dx = e.clientX - sx, dy = e.clientY - sy;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+        if (Math.abs(dx) > Math.abs(dy)) steer(dx > 0 ? 1 : -1, 0); else steer(0, dy > 0 ? 1 : -1);
+      });
+      $("dpad").addEventListener("click", function (e) {
+        var d = e.target.closest("button"); if (!d) return;
+        var m = { u: [0, -1], d: [0, 1], l: [-1, 0], r: [1, 0] }[d.dataset.d]; steer(m[0], m[1]);
+      });
+      document.addEventListener("tabsel", function (e) { if (e.detail !== "snake") pause(); });
+      document.addEventListener("visibilitychange", function () { if (document.hidden) pause(); });
+      reset(); info(); draw("Press Start");
+    })();
+
+    /* ----- Typing test ----- */
+    (function () {
+      var tp = $("tp"); if (!tp) return;
+      var texts = [
+        "A fast website is a polite website, because it respects the time of everyone who visits it.",
+        "Small functions, clear names and honest tests will save you more hours than any clever trick.",
+        "Every great project starts as a messy experiment that someone refused to throw away.",
+        "Hashing a password is easy, but remembering to salt it is what keeps the attackers away.",
+        "The best code is the code you never have to write, and the second best is easy to delete."
+      ];
+      var tin = $("tin"), out = $("twpm"), target = "", spans = [], t0 = 0, done = false, last = -1, best = num("sg-wpm");
+      function bestText() { return "Best: " + (best ? best + " WPM" : "–"); }
+      function paint(v) {
+        spans.forEach(function (sp, i) { sp.className = i < v.length ? (v[i] === target[i] ? "ok" : "bad") : i === v.length ? "cur" : ""; });
+      }
+      function newText() {
+        var i; do { i = rand(texts.length); } while (i === last);
+        last = i; target = texts[i]; t0 = 0; done = false; spans = [];
+        tp.textContent = "";
+        target.split("").forEach(function (ch) { var s = document.createElement("span"); s.textContent = ch; tp.appendChild(s); spans.push(s); });
+        tin.value = ""; tin.readOnly = false; paint(""); out.textContent = bestText();
+      }
+      function finish(v) {
+        done = true; tin.readOnly = true;
+        var min = (performance.now() - t0) / 60000, ok = 0, i;
+        for (i = 0; i < target.length; i++) if (v[i] === target[i]) ok++;
+        var wpm = Math.max(1, Math.round(target.length / 5 / min)), acc = Math.round(ok / target.length * 100), note = "";
+        if (acc >= 90 && wpm > best) { best = wpm; store("sg-wpm", String(best)); note = " · New best! 🎉"; }
+        out.textContent = wpm + " WPM · " + acc + "% accuracy" + note + (acc < 90 ? " (90%+ needed for a best)" : "");
+      }
+      tin.addEventListener("input", function () {
+        if (done) return;
+        if (!t0) t0 = performance.now();
+        var v = tin.value; paint(v);
+        if (v.length >= target.length) finish(v);
+      });
+      $("wnew").addEventListener("click", function () { newText(); tin.focus(); });
+      newText();
+    })();
   })();
 
   /* ---------- 7. Idle work: typed roles, accent picker, live GitHub ---------- */
