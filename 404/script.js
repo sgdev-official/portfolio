@@ -27,6 +27,7 @@
     if (props && (props.nodeType || typeof props === "string" || Array.isArray(props))) { kids.unshift(props); props = null; }
     Object.keys(props || {}).forEach(function (k) {
       var v = props[k];
+      if (v == null || v === false) return;
       if (k === "text") el.textContent = v;
       else if (k === "on") Object.keys(v).forEach(function (ev) { el.addEventListener(ev, v[ev]); });
       else if (k === "dataset") Object.keys(v).forEach(function (d) { el.dataset[d] = v[d]; });
