@@ -1,81 +1,57 @@
-/* ==========================================================
-   Shubhomoy (Sgdev) portfolio - script.js
-   Three small features: theme toggle, card hover glow,
-   and scroll reveal. No libraries needed.
-   ========================================================== */
-
+/* Shubhomoy (Sgdev) portfolio — script.js
+   1) mobile menu  2) active nav button while scrolling  3) scroll reveal */
 (function () {
   "use strict";
-
   var root = document.documentElement;
-
-  // Tells the CSS that JavaScript is running, so the reveal animation can start.
   root.classList.add("js");
 
-  /* ---------- 1. Light / dark theme ---------- */
-
-  // Restore the theme the visitor picked last time (if any).
-  try {
-    var savedTheme = localStorage.getItem("theme");
-    if (savedTheme) root.setAttribute("data-theme", savedTheme);
-  } catch (error) {
-    // Storage can be blocked. The site still works with the system theme.
+  /* 1. Mobile menu */
+  var burger = document.getElementById("burger");
+  var menu = document.getElementById("menu");
+  function setMenu(open) {
+    menu.classList.toggle("show", open);
+    burger.setAttribute("aria-expanded", String(open));
+    burger.setAttribute("aria-label", open ? "Close menu" : "Open menu");
   }
-
-  // Works out which theme is showing right now.
-  function currentTheme() {
-    var chosen = root.getAttribute("data-theme");
-    if (chosen) return chosen;
-    return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-  }
-
-  // Switch theme when the round button in the navigation is clicked.
-  var themeButton = document.getElementById("theme");
-  themeButton.addEventListener("click", function () {
-    var nextTheme = currentTheme() === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", nextTheme);
-    try {
-      localStorage.setItem("theme", nextTheme);
-    } catch (error) {
-      // Ignore: the choice just will not be remembered.
-    }
+  burger.addEventListener("click", function () {
+    setMenu(burger.getAttribute("aria-expanded") !== "true");
+  });
+  menu.addEventListener("click", function (e) {
+    if (e.target.closest("a")) setMenu(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") setMenu(false);
   });
 
-  /* ---------- 2. Glow that follows the mouse on cards ---------- */
-
-  document.querySelectorAll(".card").forEach(function (card) {
-    card.addEventListener("pointermove", function (event) {
-      var box = card.getBoundingClientRect();
-      card.style.setProperty("--mx", event.clientX - box.left + "px");
-      card.style.setProperty("--my", event.clientY - box.top + "px");
+  /* 2. Highlight the nav button of the section on screen */
+  var links = {};
+  document.querySelectorAll(".nb[data-s]").forEach(function (a) { links[a.dataset.s] = a; });
+  var ids = ["top", "about", "projects", "contact"];
+  function markActive() {
+    var current = "top";
+    var y = window.scrollY + window.innerHeight * 0.35;
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.offsetTop <= y) current = id;
     });
-  });
+    Object.keys(links).forEach(function (id) {
+      links[id].classList.toggle("active", id === current);
+    });
+  }
+  window.addEventListener("scroll", markActive, { passive: true });
+  markActive();
 
-  /* ---------- 3. Fade elements in as they scroll into view ---------- */
-
-  var revealItems = document.querySelectorAll(".rv");
-
+  /* 3. Fade items in once as they scroll into view */
+  var items = document.querySelectorAll(".card, .skills li, .contact, .status-card");
+  items.forEach(function (el) { el.classList.add("rv"); });
   if ("IntersectionObserver" in window) {
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in");
-            observer.unobserve(entry.target); // Animate only once.
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-
-    revealItems.forEach(function (item, index) {
-      item.style.transitionDelay = (index % 4) * 70 + "ms"; // Small stagger.
-      observer.observe(item);
-    });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    items.forEach(function (el) { io.observe(el); });
   } else {
-    // Very old browsers: just show everything.
-    revealItems.forEach(function (item) {
-      item.classList.add("in");
-    });
+    items.forEach(function (el) { el.classList.add("in"); });
   }
 })();
