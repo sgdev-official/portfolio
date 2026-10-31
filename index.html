@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Shubhomoy (Sgdev) — Full-Stack & AI Developer</title>
+<script>try{var a=localStorage.getItem("sg-accent");if(a&&/^#[0-9a-f]{6}$/i.test(a)){var d=document.documentElement.style;d.setProperty("--y",a);d.setProperty("--yr",parseInt(a.slice(1,3),16)+","+parseInt(a.slice(3,5),16)+","+parseInt(a.slice(5,7),16))}}catch(e){}</script>
 <script defer src="https://analytics.open-domains.com/script.js" data-website-id="47182971-ad20-4005-b99e-b708e5adbc6c"></script>
 <meta name="description" content="Shubhomoy (Sgdev) builds fast, secure web apps, AI tools and technical research reports.">
 <meta name="author" content="Shubhomoy (Sgdev)">
@@ -24,6 +25,8 @@
 </head>
 <body>
 
+<div class="progress" id="progress" aria-hidden="true"></div>
+
 <header class="nav-wrap">
   <div class="nav">
     <a class="brand" href="#top" aria-label="Sgdev home">
@@ -34,6 +37,7 @@
       <a class="nb" href="#top" data-s="top">Home</a>
       <a class="nb" href="#about" data-s="about">About</a>
       <a class="nb" href="#projects" data-s="projects">Projects</a>
+      <a class="nb" href="#tools" data-s="tools">Tools</a>
       <a class="nb" href="#contact" data-s="contact">Contact</a>
       <a class="nb nb-hot" href="/blog/" target="_blank" rel="noopener">Blog</a>
     </nav>
@@ -46,6 +50,7 @@
     <div class="hero-text">
       <span class="open"><i></i>Open to collaborations</span>
       <h1>I build fast, secure software for the modern web.</h1>
+      <p class="roles" aria-live="off">Right now: <span id="typed">FastAPI backends</span><i class="caret"></i></p>
       <p class="lead">I'm Shubhomoy (Sgdev), a full-stack and AI developer. I work with Python, FastAPI and edge hosting to ship tools that are quick, private and easy to use.</p>
       <div class="cta">
         <a class="btn" href="#projects">View projects</a>
@@ -54,6 +59,16 @@
     </div>
 
     <aside class="status-card" aria-label="Project status">
+      <button class="spinner" id="spinner" type="button" aria-label="Fidget spinner. Flick it or press Enter to spin.">
+        <svg viewBox="-50 -50 100 100" aria-hidden="true">
+          <g stroke="var(--y)" stroke-width="5" fill="#0a0a0a">
+            <circle cx="0" cy="-28" r="17"/><circle cx="24.25" cy="14" r="17"/><circle cx="-24.25" cy="14" r="17"/><circle r="22"/>
+          </g>
+          <g fill="#0a0a0a"><circle cx="0" cy="-28" r="17"/><circle cx="24.25" cy="14" r="17"/><circle cx="-24.25" cy="14" r="17"/><circle r="22"/></g>
+          <g fill="var(--y)"><circle cx="0" cy="-28" r="8"/><circle cx="24.25" cy="14" r="8"/><circle cx="-24.25" cy="14" r="8"/><circle r="9"/></g>
+          <circle r="4" fill="#0a0a0a"/>
+        </svg>
+      </button>
       <h2>Project status</h2>
       <p>Tools and research papers I built and maintain.</p>
       <a class="srow" href="https://scaptua.duckdns.org" target="_blank" rel="noopener">
@@ -65,6 +80,7 @@
       <a class="srow" href="/blog/" target="_blank" rel="noopener">
         <span>SGDEV Research Blog<small>Telemetry &amp; System Papers</small></span><b class="pill on">Active</b>
       </a>
+      <p class="spinhint"><span id="rpm">0</span> RPM · best <span id="best">0</span></p>
     </aside>
   </section>
 
@@ -127,13 +143,74 @@
         </div>
       </a>
 
-      <a class="card gh" href="https://github.com/sgdev-official" target="_blank" rel="noopener">
+      <div class="card gh" id="gh">
         <div class="pb">
-          <h3>More on GitHub</h3>
-          <p>Browse the full codebase, experiments and open-source work.</p>
-          <span class="go">github.com/sgdev-official</span>
+          <h3>
+            <svg class="ghi" viewBox="0 0 16 16" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            More on GitHub <b class="pill on">Live</b>
+          </h3>
+          <p>Browse the full codebase, experiments and open-source work. These numbers load straight from GitHub when you scroll here.</p>
+          <div class="ghstats">
+            <span><b data-k="public_repos">–</b>repos</span>
+            <span><b data-k="followers">–</b>followers</span>
+            <span><b data-k="following">–</b>following</span>
+          </div>
+          <ul class="repos" id="repos"></ul>
+          <p class="ghnote" id="ghnote"></p>
+          <a class="go" href="https://github.com/sgdev-official" target="_blank" rel="noopener">github.com/sgdev-official</a>
         </div>
-      </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="tools" class="wrap">
+    <h2 class="h2">Tools &amp; toys</h2>
+    <p class="sub">Small utilities that run fully in your browser. Nothing you type here is sent anywhere.</p>
+
+    <div class="tool">
+      <div class="tabs" role="tablist" aria-label="Tools">
+        <button role="tab" id="t-calc" aria-controls="p-calc" aria-selected="true" data-t="calc">Calculator</button>
+        <button role="tab" id="t-hash" aria-controls="p-hash" aria-selected="false" tabindex="-1" data-t="hash">SHA-256</button>
+        <button role="tab" id="t-pass" aria-controls="p-pass" aria-selected="false" tabindex="-1" data-t="pass">Password</button>
+      </div>
+
+      <div class="panel" id="p-calc" role="tabpanel" aria-labelledby="t-calc">
+        <div class="calcwrap">
+          <div class="calc" id="calc" tabindex="0" aria-label="Calculator. You can type with your keyboard.">
+            <div class="cdisp"><output id="cres"></output><div id="cexpr">0</div></div>
+            <div class="ckeys" id="ckeys">
+              <button data-k="C" class="fn">C</button><button data-k="(" class="fn">(</button><button data-k=")" class="fn">)</button><button data-k="⌫" class="fn" aria-label="Backspace">⌫</button>
+              <button data-k="sqrt(" class="fn">√</button><button data-k="^" class="fn">^</button><button data-k="%" class="fn">%</button><button data-k="÷" class="op">÷</button>
+              <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button data-k="×" class="op">×</button>
+              <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k="−" class="op">−</button>
+              <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="+" class="op">+</button>
+              <button data-k="π" class="fn">π</button><button data-k="0">0</button><button data-k=".">.</button><button data-k="=" class="eq">=</button>
+            </div>
+          </div>
+          <div class="histbox">
+            <h3>History</h3>
+            <ol class="hist" id="hist"><li class="empty">Your calculations show up here.</li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="p-hash" role="tabpanel" aria-labelledby="t-hash" hidden>
+        <label for="hin">Type or paste text</label>
+        <textarea id="hin" rows="4" placeholder="Hello, Sgdev"></textarea>
+        <label for="hout">SHA-256 hash</label>
+        <div class="outrow"><output id="hout" class="mono">Waiting for input…</output><button class="mini" type="button" data-copy-from="hout">Copy</button></div>
+      </div>
+
+      <div class="panel" id="p-pass" role="tabpanel" aria-labelledby="t-pass" hidden>
+        <div class="outrow"><output id="pout" class="mono">–</output><button class="mini" type="button" data-copy-from="pout">Copy</button><button class="mini" type="button" id="pgen">New</button></div>
+        <div class="popts">
+          <label class="rng">Length <b id="plenv">16</b><input type="range" id="plen" min="8" max="64" value="16"></label>
+          <label class="chk"><input type="checkbox" id="pu" checked> A–Z</label>
+          <label class="chk"><input type="checkbox" id="pn" checked> 0–9</label>
+          <label class="chk"><input type="checkbox" id="ps" checked> Symbols</label>
+        </div>
+        <p class="pstr" id="pstr"></p>
+      </div>
     </div>
   </section>
 
@@ -144,6 +221,7 @@
       <div class="cta">
         <a class="btn dark" href="mailto:info@sgdev.qd.je">info@sgdev.qd.je</a>
         <a class="btn dark" href="mailto:info@sgdev.is-cool.dev">info@sgdev.is-cool.dev</a>
+        <button class="btn dark-o" type="button" data-copy="info@sgdev.qd.je">Copy email</button>
         <a class="btn dark-o" href="https://github.com/sgdev-official" target="_blank" rel="noopener">GitHub</a>
         <a class="btn dark-o" href="/blog/">Research Blog</a>
       </div>
@@ -157,6 +235,12 @@
     <div class="frow"><span></span><span><a href="https://sgdev.is-cool.dev">sgdev.is-cool.dev</a> · info@sgdev.is-cool.dev</span></div>
   </div>
 </footer>
+
+<div class="dock" id="dock" aria-label="Page controls">
+  <span class="dots" id="dots" role="group" aria-label="Accent colour"></span>
+  <button type="button" id="up" aria-label="Back to top">↑</button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="script.js" defer></script>
 </body>
