@@ -38,6 +38,7 @@
       <a class="nb" href="#about" data-s="about">About</a>
       <a class="nb" href="#projects" data-s="projects">Projects</a>
       <a class="nb" href="#tools" data-s="tools">Tools</a>
+      <a class="nb" href="#arcade" data-s="arcade">Arcade</a>
       <a class="nb" href="#contact" data-s="contact">Contact</a>
       <a class="nb nb-hot" href="/blog/" target="_blank" rel="noopener">Blog</a>
     </nav>
@@ -210,6 +211,80 @@
           <label class="chk"><input type="checkbox" id="ps" checked> Symbols</label>
         </div>
         <p class="pstr" id="pstr"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="arcade" class="wrap">
+    <h2 class="h2">Arcade</h2>
+    <p class="sub">Five quick games written in plain JavaScript. Your scores are saved in your browser only.</p>
+
+    <div class="tool">
+      <div class="tabs" role="tablist" aria-label="Games">
+        <button role="tab" id="t-ttt" aria-controls="p-ttt" aria-selected="true" data-t="ttt">Tic-Tac-Toe</button>
+        <button role="tab" id="t-mem" aria-controls="p-mem" aria-selected="false" tabindex="-1" data-t="mem">Memory</button>
+        <button role="tab" id="t-react" aria-controls="p-react" aria-selected="false" tabindex="-1" data-t="react">Reaction</button>
+        <button role="tab" id="t-snake" aria-controls="p-snake" aria-selected="false" tabindex="-1" data-t="snake">Snake</button>
+        <button role="tab" id="t-type" aria-controls="p-type" aria-selected="false" tabindex="-1" data-t="type">Typing</button>
+      </div>
+
+      <div class="panel" id="p-ttt" role="tabpanel" aria-labelledby="t-ttt">
+        <div class="gwrap">
+          <div class="ttt" id="ttt" role="group" aria-label="Tic-Tac-Toe board"></div>
+          <div class="gside">
+            <p class="gstat" id="tstat" aria-live="polite">Your turn (X)</p>
+            <div class="seg" id="tmode" role="group" aria-label="Game mode">
+              <button type="button" data-m="easy" aria-pressed="false">Easy</button>
+              <button type="button" data-m="hard" aria-pressed="true">Unbeatable</button>
+              <button type="button" data-m="2p" aria-pressed="false">2 players</button>
+            </div>
+            <div class="score">
+              <span><b id="sw">0</b><i id="l1">You</i></span>
+              <span><b id="sd">0</b><i>Draw</i></span>
+              <span><b id="sl">0</b><i id="l3">AI</i></span>
+            </div>
+            <button class="mini big" type="button" id="tnew">New game</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="p-mem" role="tabpanel" aria-labelledby="t-mem" hidden>
+        <div class="gwrap">
+          <div class="mem" id="mem" role="group" aria-label="Memory cards"></div>
+          <div class="gside">
+            <p class="gstat" id="mstat" aria-live="polite">Moves: 0</p>
+            <p class="hint">Find all 8 pairs in as few moves as you can.</p>
+            <button class="mini big" type="button" id="mnew">Shuffle</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="p-react" role="tabpanel" aria-labelledby="t-react" hidden>
+        <button type="button" class="rarea" id="rarea">Click to start</button>
+        <p class="gstat" id="rstat" aria-live="polite">Click the box, wait for it to change colour, then click as fast as you can.</p>
+      </div>
+
+      <div class="panel" id="p-snake" role="tabpanel" aria-labelledby="t-snake" hidden>
+        <div class="gwrap">
+          <canvas id="sc" width="300" height="300" tabindex="0" aria-label="Snake game. Use the arrow keys or WASD."></canvas>
+          <div class="gside">
+            <p class="gstat" id="sstat" aria-live="off">Score: 0 · Best: 0</p>
+            <button class="mini big" type="button" id="sgo">Start</button>
+            <p class="hint">Arrow keys or WASD to steer, Space to pause. On a phone, swipe on the board or use the pad.</p>
+            <div class="dpad" id="dpad">
+              <button type="button" data-d="u" aria-label="Up">↑</button>
+              <button type="button" data-d="l" aria-label="Left">←</button>
+              <button type="button" data-d="d" aria-label="Down">↓</button>
+              <button type="button" data-d="r" aria-label="Right">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="p-type" role="tabpanel" aria-labelledby="t-type" hidden>
+        <p class="tprompt" id="tp"></p>
+        <textarea id="tin" rows="2" placeholder="Start typing to begin the timer…" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Type the text shown above"></textarea>
+        <div class="outrow trow"><p class="gstat" id="twpm" aria-live="polite"></p><button class="mini" type="button" id="wnew">New text</button></div>
       </div>
     </div>
   </section>
