@@ -6,13 +6,14 @@
 <meta name="robots" content="noindex">
 <script>
 (function () {
-  var target = "/404/";
-  if (location.pathname.replace(/\/+$/, "") !== target.replace(/\/+$/, "")) {
+  var target = "https://sgdev.qd.je/404/";
+  var here = location.origin + location.pathname.replace(/\/+$/, "") + "/";
+  if (here !== target) {
     location.replace(target);          // no hash, so no loop
   }
 })();
 </script>
-<noscript><meta http-equiv="refresh" content="0;sgdev.qd.je/404/"></noscript>
+<noscript><meta http-equiv="refresh" content="0;url=https://sgdev.qd.je/404/"></noscript>
 </head>
-<body><p><a href="/404/">Page not found. Click here if you aren't redirected.</a></p></body>
+<body><p><a href="https://sgdev.qd.je/404/">Page not found. Click here if you aren't redirected.</a></p></body>
 </html>
