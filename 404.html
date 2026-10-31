@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <title>404</title>
-</head>
-<body>
+<meta name="robots" content="noindex">
 <script>
 (function () {
-  var h = location.hash.slice(1);
-  if (h && !document.getElementById(h)) {
-    location.replace("/404.html");
+  var target = "/404/";
+  if (location.pathname.replace(/\/+$/, "") !== target.replace(/\/+$/, "")) {
+    location.replace(target);          // no hash, so no loop
   }
 })();
 </script>
-</body>
+<noscript><meta http-equiv="refresh" content="0;url=/404/"></noscript>
+</head>
+<body><p><a href="/404/">Page not found. Click here if you aren't redirected.</a></p></body>
 </html>
