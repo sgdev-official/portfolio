@@ -1,19 +1,58 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>404</title>
-<meta name="robots" content="noindex">
-<script>
-(function () {
-  var target = "https://sgdev.qd.je/404/";
-  var here = location.origin + location.pathname.replace(/\/+$/, "") + "/";
-  if (here !== target) {
-    location.replace(target);          // no hash, so no loop
-  }
-})();
-</script>
-<noscript><meta http-equiv="refresh" content="0;url=https://sgdev.qd.je/404/"></noscript>
+    <meta charset="utf-8">
+    <title>404 - Page Not Found | Sgdev</title>
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #ffffff;
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ffcc00;
+            font-size: 80px;
+            margin: 10px 0;
+        }
+        p {
+            color: #b3b3b3;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #ffcc00;
+            color: #0d0d0d;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #e6b800;
+        }
+        img {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
-<body><p><a href="https://sgdev.qd.je/404/">Page not found. Click here if you aren't redirected.</a></p></body>
+<body>
+    <div class="container">
+        <!-- Image path set from /404/ folder as requested -->
+        <img src="/404/walrus-404.png" alt="404 Walrus">
+        <h1>404</h1>
+        <p>This page swam away. The page you wanted isn't here. It may have moved or never existed.</p>
+        <a href="/" class="btn">Back to home</a>
+    </div>
+</body>
 </html>
