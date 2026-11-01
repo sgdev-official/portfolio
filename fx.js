@@ -144,7 +144,7 @@
   var C = [
     ["Go: Home", go("top")], ["Go: About", go("about")], ["Go: Projects", go("projects")], ["Go: Tools", go("tools")], ["Go: Arcade", go("arcade")], ["Go: Contact", go("contact")],
     ["Open: Blog", open("/blog/")], ["Open: Clock", open("https://www.sgdev.qd.je/clock/")], ["Open: Dev Tools", open("https://www.sgdev.is-cool.dev/devtools/")],
-    ["Open: Matrix Terminal", open("https://www.sgdev.is-cool.dev/terminal/")], ["Open: GitHub", open("https://github.com/sgdev-official")],
+    ["Open: Matrix Terminal", open("https://www.sgdev.is-cool.dev/terminal/")], ["Open: Image Gallery", open("https://www.sgdev.qd.je/image-gellery/#gallery")], ["Open: GitHub", open("https://github.com/sgdev-official")],
     ["Theme: JS yellow", th("#ffe21a")], ["Theme: HTML red", th("#cd0d0d")], ["Theme: CSS blue", th("#1b66d2")],
     ["Copy email", function () { S.copy("info@sgdev.qd.je"); }], ["Confetti!", function () { S.confetti(); }], ["Matrix rain (Konami)", S.rain],
     ["Tool: JSON formatter", tab("json")], ["Tool: Base64", tab("b64")], ["Tool: UUID generator", tab("uuid")], ["Tool: Colour converter", tab("color")],
