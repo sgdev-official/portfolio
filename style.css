@@ -322,6 +322,12 @@ html.js .rv.in{opacity:1;transform:none}
 .card:hover .pv6 span{animation-duration:.9s}
 @keyframes rain{from{transform:translateY(-70%)}to{transform:translateY(70%)}}
 
+/* image gallery card preview: spinning bearing rings */
+.pv7{display:grid;grid-template-columns:repeat(3,40px);gap:8px;justify-content:center;align-content:center}
+.pv7 i{height:40px;border-radius:50%;border:4px dashed var(--y);background:#141414;animation:spin 9s linear infinite}
+.pv7 i:nth-child(2n){animation-direction:reverse;background:rgba(var(--yr),.22)}
+.card:hover .pv7 i{animation-duration:2s}
+
 /* responsive */
 @media (max-width:860px){
   .hero,.about{grid-template-columns:1fr;gap:36px}
