@@ -45,6 +45,23 @@
     }
   });
 
+  /* ---------- Lazy modules (nothing below loads until needed, so first paint stays light) ---------- */
+  var SG = window.SG = { $: $, store: store, toast: toast, copy: copy, reduce: reduce }, mods = {};
+  SG.load = function (n) {
+    if (!mods[n]) mods[n] = new Promise(function (ok, no) {
+      if (!$("xcss")) { var l = document.createElement("link"); l.id = "xcss"; l.rel = "stylesheet"; l.href = "extras.css"; document.head.appendChild(l); }
+      var sc = document.createElement("script"); sc.src = n + ".js"; sc.onload = ok; sc.onerror = no; document.body.appendChild(sc);
+    });
+    return mods[n];
+  };
+  function openPal() { SG.load("fx").then(function () { if (SG.pal) SG.pal(); }); }
+  document.addEventListener("keydown", function (e) {
+    if (e.defaultPrevented) return;
+    var k = e.key.toLowerCase(), tg = (document.activeElement || {}).tagName || "";
+    if (((e.ctrlKey || e.metaKey) && k === "k") || (k === "/" && !/INPUT|TEXTAREA|SELECT/.test(tg))) { e.preventDefault(); openPal(); }
+  });
+  if ($("cmdk")) $("cmdk").addEventListener("click", openPal);
+
   /* ---------- 1. Mobile menu ---------- */
   var burger = $("burger"), menu = $("menu");
   function setMenu(open) {
@@ -288,12 +305,14 @@
     return { evaluate: evaluate, fmt: fmt };
   })();
 
+  SG.ev = calcApi.evaluate; SG.fmt = calcApi.fmt;
+
   /* ---------- 6. Tabs, SHA-256, password generator ---------- */
   (function () {
     document.querySelectorAll(".tabs").forEach(function (group) {
-      var tabs = Array.prototype.slice.call(group.querySelectorAll("[role=tab]"));
+      function all() { return Array.prototype.slice.call(group.querySelectorAll("[role=tab]")); }
       function select(t) {
-        tabs.forEach(function (x) {
+        all().forEach(function (x) {
           var on = x === t;
           x.setAttribute("aria-selected", String(on));
           x.tabIndex = on ? 0 : -1;
@@ -302,13 +321,12 @@
         t.focus();
         document.dispatchEvent(new CustomEvent("tabsel", { detail: t.dataset.t }));
       }
-      tabs.forEach(function (t, i) {
-        t.addEventListener("click", function () { select(t); });
-        t.addEventListener("keydown", function (e) {
-          var n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : null;
-          if (n === null) return;
-          e.preventDefault(); select(tabs[(n + tabs.length) % tabs.length]);
-        });
+      group.addEventListener("click", function (e) { var t = e.target.closest("[role=tab]"); if (t) select(t); });
+      group.addEventListener("keydown", function (e) {
+        var t = e.target.closest("[role=tab]"); if (!t) return;
+        var tabs = all(), i = tabs.indexOf(t), n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : null;
+        if (n === null) return;
+        e.preventDefault(); select(tabs[(n + tabs.length) % tabs.length]);
       });
     });
 
@@ -706,6 +724,18 @@
       if (!reduce) requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
+  })();
+
+  /* ---------- 6d. Lazy triggers: effects on first input, lab when Tools/Arcade near the viewport ---------- */
+  (function () {
+    var evs = ["pointermove", "pointerdown", "keydown", "touchstart", "scroll"];
+    function first() { evs.forEach(function (t) { removeEventListener(t, first); }); SG.load("fx"); }
+    evs.forEach(function (t) { addEventListener(t, first, { passive: true }); });
+    var tl = $("tools");
+    if ("IntersectionObserver" in window && tl) {
+      var lio = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { SG.load("lab"); lio.disconnect(); } }, { rootMargin: "700px" });
+      lio.observe(tl);
+    } else evs.forEach(function (t) { addEventListener(t, function () { SG.load("lab"); }, { once: true, passive: true }); });
   })();
 
   /* ---------- 7. Idle work: typed roles, theme picker, live GitHub ---------- */
