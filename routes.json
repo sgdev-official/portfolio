@@ -1,0 +1,5 @@
+{
+  "routes": {
+    "/*": "https://sgdev.qd.je/ 301"
+  }
+}
