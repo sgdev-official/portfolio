@@ -35,13 +35,13 @@
     const w = 480;
     const seed = 1000 + i * 13;
     if (src.id === "unsplash") {
-      const q = src.queries[i % src.queries.length];
-      const fallbackPrompt = "photo of " + q;
+      const word = src.seeds[i % src.seeds.length];
+      const sd = word + "-" + i;
       return {
-        id: "u" + i, source: "unsplash", title: q, w, h,
-        thumb: "https://source.unsplash.com/random/" + w + "x" + h + "/?" + encodeURIComponent(q) + "&sig=" + i,
-        full: "https://source.unsplash.com/random/1200x" + Math.round(h * 2.5) + "/?" + encodeURIComponent(q) + "&sig=" + i,
-        fallback: pollUrl(cfg, fallbackPrompt, w, h, seed, "flux")
+        id: "u" + i, source: "unsplash", title: word, w, h,
+        thumb: "https://picsum.photos/seed/" + sd + "/" + w + "/" + h,
+        full: "https://picsum.photos/seed/" + sd + "/1200/" + Math.round(h * 2.5),
+        fallback: "https://robohash.org/fb-" + i + "?set=set1&size=" + w + "x" + w
       };
     }
     if (src.id === "robohash") {
@@ -52,7 +52,7 @@
         id: "r" + i, source: "robohash", title: "Robot " + set, w, h: w,
         thumb: base + "&size=" + w + "x" + w,
         full: base + "&size=900x900",
-        fallback: pollUrl(cfg, "cute robot character, flat colours", w, w, seed, "turbo")
+        fallback: "https://robohash.org/alt-" + i + "?set=set2&size=" + w + "x" + w
       };
     }
     const prompt = src.prompts[i % src.prompts.length];
@@ -93,7 +93,7 @@ button{cursor:pointer}
 /* layer 0: image mosaic background */
 .L0{position:fixed;inset:-4%;z-index:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-auto-rows:150px;gap:0;transform:rotate(-4deg) scale(1.1);filter:saturate(1.2) contrast(1.1)}
 .L0 img{width:100%;height:100%;object-fit:cover;display:block;opacity:.0;transition:opacity .8s}
-.L0 img.on{opacity:.75}
+.L0 img.on{opacity:.55}
 /* layer 1: colour washes, tuned so the images still show through */
 .L1{position:fixed;inset:0;z-index:1;pointer-events:none;background:
   linear-gradient(115deg,${P.blue}d9 0%,${P.blue}66 28%,transparent 50%),
@@ -110,7 +110,7 @@ button{cursor:pointer}
 
 .wrap{position:relative;z-index:10;max-width:1280px;margin:0 auto;padding:22px 28px 90px}
 header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
-.logo{font-family:var(--d);font-size:clamp(2.4rem,8vw,5.6rem);line-height:.88;letter-spacing:-.03em;color:var(--y);background:var(--k);padding:10px 18px 14px;border:5px solid var(--y);box-shadow:10px 10px 0 var(--r),20px 20px 0 var(--b);transform:rotate(-1.2deg)}
+.logo{font-family:var(--d);font-size:clamp(1.5rem,4.6vw,3.3rem);line-height:1;letter-spacing:-.02em;max-width:880px;color:var(--y);background:var(--k);padding:10px 18px 14px;border:5px solid var(--y);box-shadow:10px 10px 0 var(--r),20px 20px 0 var(--b);transform:rotate(-1.2deg)}
 .tag{font-family:var(--d);font-size:1rem;background:var(--r);color:var(--y);padding:8px 14px;border:3px solid var(--k);box-shadow:5px 5px 0 var(--k)}
 nav{display:flex;gap:10px;margin:26px 0 18px;flex-wrap:wrap}
 .tab,.chip{font-family:var(--d);background:var(--k);color:var(--y);border:3px solid var(--y);padding:10px 18px;box-shadow:5px 5px 0 var(--b);transition:transform .12s,box-shadow .12s,background .12s}
@@ -155,6 +155,15 @@ textarea{min-height:110px;resize:vertical}
 .lb .bottom{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
 .lb .ttl{font-family:var(--d);flex-basis:100%;text-align:center;font-size:.95rem}
 .sr{position:absolute;left:-9999px}
+.RG{position:fixed;inset:0;z-index:1;overflow:hidden;pointer-events:none}
+.ring{position:absolute;left:50%;top:50%;width:0;height:0;animation:rs linear infinite}
+.ring i{position:absolute;display:block;border-radius:50%;border:3px solid var(--y);box-shadow:0 0 0 3px var(--k),4px 4px 0 3px var(--r);overflow:hidden;background:var(--b)}
+.ring i img{width:100%;height:100%;object-fit:cover;display:block}
+.track{position:absolute;left:50%;top:50%;border-radius:50%;border:4px dashed ${P.yellow}88}
+.cg{position:absolute;left:50%;top:50%;border-radius:50%;animation:rs linear infinite;mix-blend-mode:screen;opacity:.4}
+@keyframes rs{to{transform:rotate(360deg)}}
+.wheel{width:96px;height:96px;border-radius:50%;margin:0 auto 14px;border:10px solid var(--y);border-top-color:var(--r);border-bottom-color:var(--b);animation:sp 1.4s linear infinite}
+.note{font-size:.85rem;margin-top:14px;padding:10px;border:3px dashed var(--y);background:var(--k)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.L0{transform:none}}
 `;
     document.head.append(el("style", { text: css }));
@@ -162,6 +171,44 @@ textarea{min-height:110px;resize:vertical}
   }
 
   /* ---------- background layers ---------- */
+  function ringImg(i, size) {
+    const sets = ["set1", "set2", "set3", "set4", "set5"];
+    return "https://robohash.org/ring-" + i + "?set=" + sets[i % 5] + "&bgset=bg1&size=" + size + "x" + size;
+  }
+
+  function buildRings(cfg) {
+    const wrap = el("div", { class: "RG" });
+    const P = cfg.palette;
+    const cols = [P.red, P.blue, P.yellow];
+    // big spinning colour wheels
+    [1500, 1100, 760].forEach((d, k) => {
+      const w = el("div", { class: "cg" });
+      w.style.cssText = "width:" + d + "px;height:" + d + "px;margin:" + (-d / 2) + "px 0 0 " + (-d / 2) + "px;" +
+        "background:conic-gradient(" + cols[k % 3] + ",transparent 25%," + cols[(k + 1) % 3] + " 50%,transparent 75%," + cols[k % 3] + ");" +
+        "animation-duration:" + (60 + k * 40) + "s;animation-direction:" + (k % 2 ? "reverse" : "normal");
+      wrap.append(w);
+    });
+    let n = 0;
+    cfg.rings.forEach((r) => {
+      const d = r.radius * 2;
+      const track = el("div", { class: "track" });
+      track.style.cssText = "width:" + d + "px;height:" + d + "px;margin:" + (-r.radius) + "px 0 0 " + (-r.radius) + "px";
+      const ring = el("div", { class: "ring" });
+      ring.style.cssText = "animation-duration:" + r.speed + "s;animation-direction:" + (r.dir > 0 ? "normal" : "reverse");
+      for (let k = 0; k < r.count; k++) {
+        const a = (360 / r.count) * k;
+        const ball = el("i");
+        ball.style.cssText = "width:" + r.size + "px;height:" + r.size + "px;margin:" + (-r.size / 2) + "px 0 0 " + (-r.size / 2) +
+          "px;transform:rotate(" + a + "deg) translateY(" + (-r.radius) + "px)";
+        const im = el("img", { alt: "", loading: "lazy", decoding: "async", src: ringImg(n++, Math.min(r.size * 2, 256)) });
+        ball.append(im);
+        ring.append(ball);
+      }
+      wrap.append(track, ring);
+    });
+    return wrap;
+  }
+
   function buildLayers(cfg) {
     const root = el("div", { "aria-hidden": "true" });
     const l0 = el("div", { class: "L0" });
@@ -179,7 +226,7 @@ textarea{min-height:110px;resize:vertical}
       tiles.push(img);
     }
     l0.append(...tiles);
-    root.append(l0);
+    root.append(l0, buildRings(cfg));
     ["L1", "L2", "L3", "L4", "L5"].forEach((c) => root.append(el("div", { class: c })));
     document.body.prepend(root);
   }
@@ -309,13 +356,31 @@ textarea{min-height:110px;resize:vertical}
   }
 
   /* ---------- image maker ---------- */
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const loadImg = (url) => new Promise((res, rej) => { const p = new Image(); p.onload = () => res(url); p.onerror = rej; p.src = url; });
+
+  async function fetchPoll(url) {
+    try {
+      const r = await fetch(url);
+      if (r.status === 429) return { limited: true };
+      if (!r.ok) return { error: true };
+      const b = await r.blob();
+      if (!/^image\//.test(b.type)) return { error: true };
+      return { blob: URL.createObjectURL(b) };
+    } catch (e) {
+      return { cors: true };
+    }
+  }
+
   function buildMaker(cfg, lb) {
     const T = cfg.text, G = cfg.generator;
     const history = store.get("history", []);
 
+    const engine = el("select", { id: "engine" }, G.engines.map((e) => el("option", { value: e.id, text: e.label })));
     const prompt = el("textarea", { id: "prompt", placeholder: T.promptPlaceholder });
     const style = el("select", { id: "style" }, G.styles.map((s, i) => el("option", { value: i, text: s.label })));
     const model = el("select", { id: "model" }, G.models.map((m) => el("option", { value: m, text: m })));
+    const chara = el("select", { id: "chara" }, G.characters.map((c) => el("option", { value: c.id, text: c.label })));
     const size = el("select", { id: "size" }, G.sizes.map((s, i) => el("option", { value: i, text: s.label })));
     const seed = el("input", { type: "number", id: "seed", value: String(rnd(999999)), min: "0" });
     const fixed = el("input", { type: "checkbox", id: "fixed" });
@@ -324,20 +389,49 @@ textarea{min-height:110px;resize:vertical}
     const stage = el("div", { class: "stage" }, [el("p", { class: "msg", text: T.empty })]);
     const acts = el("div", { class: "acts" });
     const hist = el("div", { class: "hist" });
+    const note = el("p", { class: "note" });
 
     const lab = (txt, input, id) => el("div", {}, [el("label", { class: "f", for: id, text: txt }), input]);
+    const wEngine = lab("Generator", engine, "engine");
+    const wStyle = lab("Style", style, "style");
+    const wModel = lab("Model", model, "model");
+    const wChara = lab("Character", chara, "chara");
     const left = el("div", { class: "panel" }, [
+      wEngine,
       lab("Prompt", prompt, "prompt"),
       el("div", { class: "acts" }, [idea]),
-      el("div", { class: "row" }, [lab("Style", style, "style"), lab("Model", model, "model")]),
+      el("div", { class: "row" }, [wStyle, wModel, wChara]),
       el("div", { class: "row" }, [lab("Size", size, "size"), lab("Seed", seed, "seed")]),
       el("label", { class: "f" }, [fixed, document.createTextNode(" Keep this seed every time")]),
-      go
+      go, note
     ]);
     const right = el("div", { class: "panel" }, [stage, acts, hist]);
     const wrap = el("section", { class: "maker" }, [left, right]);
 
-    let current = null;
+    function sync() {
+      const rb = engine.value === "robohash";
+      wStyle.style.display = rb ? "none" : "";
+      wModel.style.display = rb ? "none" : "";
+      wChara.style.display = rb ? "" : "none";
+      note.textContent = rb ? T.robohashNote : T.pollNote;
+    }
+    engine.onchange = sync;
+    sync();
+
+    function wheel(text) {
+      stage.textContent = "";
+      stage.append(el("div", { class: "msg" }, [el("div", { class: "wheel" }), document.createTextNode(text)]));
+    }
+
+    async function waitCooldown() {
+      const total = G.cooldownSeconds * 1000;
+      for (;;) {
+        const left = Math.ceil((total - (Date.now() - store.get("lastPoll", 0))) / 1000);
+        if (left <= 0) return;
+        wheel(T.waiting.replace("{s}", left));
+        await sleep(1000);
+      }
+    }
 
     function renderHistory() {
       hist.textContent = "";
@@ -349,60 +443,80 @@ textarea{min-height:110px;resize:vertical}
     }
 
     function showResult(r) {
-      current = r;
+      const shown = r.blob || r.url;
       stage.textContent = "";
-      const img = el("img", { alt: r.prompt, src: r.url });
-      stage.append(img);
+      stage.append(el("img", { alt: r.prompt, src: shown }));
       acts.textContent = "";
       const dl = el("button", { class: "chip", text: T.download });
-      dl.onclick = () => downloadImage(r.url, "bear-ai-" + r.seed + ".jpg");
+      dl.onclick = () => downloadImage(shown, "sg-dev-" + r.seed + ".jpg");
       const op = el("a", { class: "chip", href: r.url, target: "_blank", rel: "noopener", text: T.open });
       const cp = el("button", { class: "chip", text: "Copy link" });
-      cp.onclick = () => { navigator.clipboard && navigator.clipboard.writeText(r.url); cp.textContent = "Copied"; setTimeout(() => (cp.textContent = "Copy link"), 1400); };
+      cp.onclick = () => { if (navigator.clipboard) navigator.clipboard.writeText(r.url); cp.textContent = "Copied"; setTimeout(() => (cp.textContent = "Copy link"), 1400); };
       const again = el("button", { class: "chip", text: "New variation" });
       again.onclick = () => { seed.value = String(rnd(999999)); run(); };
       acts.append(dl, op, cp, again);
     }
 
-    function run() {
+    function fail(text) {
+      stage.textContent = "";
+      stage.append(el("p", { class: "msg", text }));
+    }
+
+    let busy = false;
+    async function run() {
       const base = prompt.value.trim();
       if (!base) { prompt.focus(); return; }
-      const st = G.styles[+style.value];
-      const sz = G.sizes[+size.value];
-      const full = base + st.suffix;
-      const sd = +seed.value || rnd(999999);
-      const url = pollUrl(cfg, full, sz.w, sz.h, sd, model.value);
-
+      if (busy) return;
+      busy = true;
       go.disabled = true;
       go.textContent = T.loading;
-      stage.textContent = "";
-      stage.append(el("div", { class: "msg" }, [el("div", { class: "spin" }), document.createTextNode(T.loading)]));
       acts.textContent = "";
+      const sz = G.sizes[+size.value];
+      const sd = +seed.value || rnd(999999);
+      let result = null;
 
-      const probe = new Image();
-      probe.onload = () => {
-        go.disabled = false; go.textContent = T.generate;
-        const r = { prompt: base, url, seed: sd };
-        showResult(r);
-        history.unshift(r);
+      try {
+        if (engine.value === "robohash") {
+          wheel(T.loading);
+          const url = "https://robohash.org/" + encodeURIComponent(base + "-" + sd) + "?set=" + chara.value +
+            "&bgset=bg1&size=" + Math.min(sz.w, 1024) + "x" + Math.min(sz.h, 1024);
+          await loadImg(url);
+          result = { prompt: base, url, seed: sd };
+        } else {
+          const url = pollUrl(cfg, base + G.styles[+style.value].suffix, sz.w, sz.h, sd, model.value);
+          for (let tries = 0; tries < 3 && !result; tries++) {
+            await waitCooldown();
+            wheel(T.loading);
+            store.set("lastPoll", Date.now());
+            const res = await fetchPoll(url);
+            if (res.blob) result = { prompt: base, url, seed: sd, blob: res.blob };
+            else if (res.cors) { await loadImg(url); result = { prompt: base, url, seed: sd }; }
+            else if (res.limited) continue;
+            else throw new Error("bad");
+          }
+          if (!result) { fail(T.limit); }
+        }
+      } catch (e) {
+        fail(T.failed);
+      }
+
+      if (result) {
+        showResult(result);
+        history.unshift({ prompt: result.prompt, url: result.url, seed: result.seed });
         history.length = Math.min(history.length, 24);
         store.set("history", history);
         renderHistory();
         if (!fixed.checked) seed.value = String(rnd(999999));
-      };
-      probe.onerror = () => {
-        go.disabled = false; go.textContent = T.generate;
-        stage.textContent = "";
-        stage.append(el("p", { class: "msg", text: T.failed }));
-      };
-      probe.src = url;
+      }
+      busy = false;
+      go.disabled = false;
+      go.textContent = T.generate;
     }
 
     go.onclick = run;
     idea.onclick = () => { prompt.value = pick(G.randomPrompts); prompt.focus(); };
     prompt.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") run(); });
     renderHistory();
-    if (history[0]) showResult(history[0]);
     return wrap;
   }
 
