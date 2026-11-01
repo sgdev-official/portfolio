@@ -1,7 +1,8 @@
 /* Shubhomoy (Sgdev) portfolio — script.js
    Core:   mobile menu, active nav, scroll progress, scroll reveal, dancing mascot
    Extras: fidget spinner, live GitHub stats (lazy), calculator, SHA-256, password generator,
-           typed roles, 3-colour theme picker (HTML red / CSS blue / JS yellow), copy buttons, back-to-top
+           typed roles, 3-colour theme picker (HTML red / CSS blue / JS yellow), copy buttons, back-to-top,
+           meshing gear machine background
    No libraries. Everything non-critical starts when the browser is idle. */
 (function () {
   "use strict";
@@ -625,6 +626,73 @@
       $("wnew").addEventListener("click", function () { newText(); tin.focus(); });
       newText();
     })();
+  })();
+
+  /* ---------- 6c. Gear machine ---------- */
+  (function () {
+    var host = $("machine"); if (!host) return;
+    var NS = "http://www.w3.org/2000/svg", M = 6, PI = Math.PI;
+    function pt(r, t) { return (r * Math.cos(t)).toFixed(1) + "," + (r * Math.sin(t)).toFixed(1); }
+    function hole(cx, cy, r) { return "M" + (cx + r).toFixed(1) + "," + cy.toFixed(1) + "a" + r + "," + r + " 0 1,0 " + (-2 * r) + ",0a" + r + "," + r + " 0 1,0 " + (2 * r) + ",0z"; }
+    function gearPath(n) {
+      var r = n * M / 2, ro = r + M * 0.9, rr = r - M * 1.15, a = 2 * PI / n;
+      var d = "M" + pt(rr, -0.3 * a);
+      for (var k = 0; k < n; k++) {
+        var b = k * a;
+        d += "L" + pt(ro, b - 0.14 * a) + "L" + pt(ro, b + 0.14 * a) + "L" + pt(rr, b + 0.3 * a) +
+             "A" + rr + "," + rr + " 0 0 1 " + pt(rr, b + 0.7 * a);
+      }
+      d += "Z" + hole(0, 0, r * 0.12);
+      if (n >= 16) {
+        var cnt = n >= 28 ? 6 : 5;
+        for (var h = 0; h < cnt; h++) {
+          var t = h * 2 * PI / cnt;
+          d += hole(r * 0.58 * Math.cos(t), r * 0.58 * Math.sin(t), r * 0.16);
+        }
+      }
+      return d;
+    }
+    /* root gears have x,y and a direction; children mesh with a parent at angle a (degrees) */
+    var G = [
+      { n: 44, x: 150, y: 180, w: 1 },
+      { n: 28, p: 0, a: 25 }, { n: 18, p: 1, a: -35 }, { n: 32, p: 1, a: 75 },
+      { n: 14, p: 3, a: 30 }, { n: 22, p: 0, a: 100 },
+      { n: 40, x: 1050, y: 620, w: -1 },
+      { n: 26, p: 6, a: -160 }, { n: 16, p: 7, a: -120 },
+      { n: 30, p: 6, a: -80 }, { n: 18, p: 9, a: -140 }, { n: 12, p: 10, a: -170 },
+      { n: 20, x: 700, y: 90, w: 1 },
+      { n: 12, p: 12, a: 20 }, { n: 24, p: 12, a: 160 }
+    ];
+    var svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 1200 800");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+    G.forEach(function (g, i) {
+      if (g.p === undefined) { g.th = 0; }
+      else {
+        var P = G[g.p], phi = g.a * PI / 180, d = M * (P.n + g.n) / 2;
+        var aP = 2 * PI / P.n, aG = 2 * PI / g.n, x = (phi - P.th) / aP;
+        var pA = x - Math.floor(x);
+        g.x = P.x + d * Math.cos(phi); g.y = P.y + d * Math.sin(phi);
+        g.th = phi + PI - (0.5 - pA) * aG;
+        g.w = -P.w * P.n / g.n;
+      }
+      var path = document.createElementNS(NS, "path");
+      path.setAttribute("d", gearPath(g.n));
+      if (i % 4 === 0) path.setAttribute("class", "hot");
+      svg.appendChild(path); g.el = path;
+    });
+    host.appendChild(svg);
+
+    var s = 0, lastY = window.scrollY, lastT = performance.now();
+    function frame(t) {
+      var dt = Math.min(50, t - lastT); lastT = t;
+      var y = window.scrollY; s += dt * 0.012 + (y - lastY) * 0.25; lastY = y;
+      G.forEach(function (g) {
+        g.el.setAttribute("transform", "translate(" + g.x.toFixed(1) + " " + g.y.toFixed(1) + ") rotate(" + (g.th * 180 / PI + g.w * s).toFixed(2) + ")");
+      });
+      if (!reduce) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   })();
 
   /* ---------- 7. Idle work: typed roles, theme picker, live GitHub ---------- */
