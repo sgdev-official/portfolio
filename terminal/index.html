@@ -1,16 +1,25 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terminal</title>
-</head>
     <style>
         body {
             background-color: #373c3c;
-            text-align: center;
             color: #faf7e5;
+            font-family: monospace;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
         }
-        
+        #term {
+            width: 100%;
+            height: 100vh;
+            box-sizing: border-box;
+        }
     </style>
+</head>
 <body>
     <div id="term"></div>
     <script src="script.js"></script>
