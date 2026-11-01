@@ -1,6 +1,6 @@
 # 🚀 SGDEV Developer Portfolio & Technical Research Blog
 
-Welcome to the official source repository for **SGDEV Labs** (`sgdev.qd.je`). This platform hosts my primary personal software engineering portfolio along with an integrated open-source technical research blog.
+Welcome to the official source repository for **SGDEV Labs** (`sgdev.qd.je / sgdev.is-cool.dev`). This platform hosts my primary personal software engineering portfolio along with an integrated open-source technical research blog.
 
 ---
 
