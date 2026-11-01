@@ -177,17 +177,18 @@ function drawTop() {
 applyTheme();
 document.body.appendChild(ring);
 document.body.appendChild(h('div', { className: 'app' },
-  h('div', { className: 'left' }, cv, h('div', {}, bigEl, dateEl, metaEl), topRow, miniEl, miniInfo, gv, gearNote),
-  h('div', { className: 'right' }, tabsEl, panel)));
-var ctx = cv.getContext('2d'), gctx = gv.getContext('2d'), Z = 320, GH = 200, dpr = 1;
+  h('div', { className: 'left' }, cv, h('div', {}, bigEl, dateEl, metaEl), topRow, miniEl, miniInfo),
+  h('div', { className: 'right' }, tabsEl, panel, gv, gearNote)));
+var ctx = cv.getContext('2d'), gctx = gv.getContext('2d'), Z = 320, GW = 320, GH = 200, dpr = 1;
 function resize() {
   dpr = window.devicePixelRatio || 1;
   var w = cv.parentNode.clientWidth || 320;
-  Z = Math.max(240, Math.min(560, w)); GH = Math.floor(Z * 0.62);
+  Z = Math.max(240, Math.min(560, w));
+  GW = Math.max(240, Math.min(560, gv.parentNode.clientWidth || w)); GH = Math.floor(GW * 0.62);
   cv.width = Math.floor(Z * dpr); cv.height = Math.floor(Z * dpr);
   cv.style.width = Z + 'px'; cv.style.height = Z + 'px';
-  gv.width = Math.floor(Z * dpr); gv.height = Math.floor(GH * dpr);
-  gv.style.width = Z + 'px'; gv.style.height = GH + 'px';
+  gv.width = Math.floor(GW * dpr); gv.height = Math.floor(GH * dpr);
+  gv.style.width = GW + 'px'; gv.style.height = GH + 'px';
 }
 on(window, 'resize', resize);
 var gAng = 0, gLast = 0, gBoost = 1;
@@ -262,7 +263,7 @@ var TRAIN = [
   { n: 8, p: 1, phi: -1.5708, k: 'c' }
 ];
 function drawGears(tms) {
-  var T = TH(), c = gctx, W = Z, m = W / 160, i, g, par, pr, r, col, pos = [], ang = [];
+  var T = TH(), c = gctx, W = GW, m = W / 160, i, g, par, pr, r, col, pos = [], ang = [];
   var dt = gLast ? Math.min(0.1, (tms - gLast) / 1000) : 0; gLast = tms;
   gBoost = 1 + (gBoost - 1) * Math.exp(-dt * 1.2);
   gAng += dt * TAU / 24 * gBoost;
