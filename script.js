@@ -1,7 +1,7 @@
 /* Shubhomoy (Sgdev) portfolio — script.js
-   Core:   mobile menu, active nav, scroll progress, scroll reveal
+   Core:   mobile menu, active nav, scroll progress, scroll reveal, dancing mascot
    Extras: fidget spinner, live GitHub stats (lazy), calculator, SHA-256, password generator,
-           typed roles, accent picker, copy buttons, back-to-top
+           typed roles, 3-colour theme picker (HTML red / CSS blue / JS yellow), copy buttons, back-to-top
    No libraries. Everything non-critical starts when the browser is idle. */
 (function () {
   "use strict";
@@ -79,7 +79,7 @@
   onScroll();
 
   /* ---------- 3. Scroll reveal ---------- */
-  var items = document.querySelectorAll(".card, .skills li, .contact, .status-card, .tool");
+  var items = document.querySelectorAll(".card, .lcard, .skills li, .contact, .status-card, .tool");
   items.forEach(function (el) { el.classList.add("rv"); });
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
@@ -91,6 +91,15 @@
   } else {
     items.forEach(function (el) { el.classList.add("in"); });
   }
+
+  /* ---------- 3b. Dancing mascot ---------- */
+  (function () {
+    var m = $("mascot"), t = 0; if (!m) return;
+    m.addEventListener("click", function () {
+      m.classList.add("hype"); toast("Splash! 🌊");
+      clearTimeout(t); t = setTimeout(function () { m.classList.remove("hype"); }, 2500);
+    });
+  })();
 
   /* ---------- 4. Fidget spinner ---------- */
   (function () {
@@ -342,7 +351,6 @@
       var b, turn, over = false, first = "X", mode = "hard", token = 0, sc = { w: 0, d: 0, l: 0 }, cells = [];
       var stat = $("tstat");
 
-      /*ttt-ai*/
       var L = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
       function win(bd) {
         for (var i = 0; i < 8; i++) {
@@ -375,7 +383,6 @@
         });
         return pick[rand(pick.length)];
       }
-      /*end-ttt-ai*/
 
       for (var k = 0; k < 9; k++) (function (i) {
         var c = document.createElement("button");
@@ -620,7 +627,7 @@
     })();
   })();
 
-  /* ---------- 7. Idle work: typed roles, accent picker, live GitHub ---------- */
+  /* ---------- 7. Idle work: typed roles, theme picker, live GitHub ---------- */
   idle(function () {
     /* Typed roles */
     var typed = $("typed");
@@ -628,7 +635,7 @@
       var words = ["FastAPI backends", "AI chat tools", "captcha & security systems", "RF telemetry research", "fast static sites"];
       var wi = 0, ci = words[0].length, del = true;
       (function tick() {
-        var w = words[wi], d = 70;
+        var d = 70;
         if (del) {
           ci--; d = 35;
           if (ci <= 0) { del = false; wi = (wi + 1) % words.length; ci = 0; d = 300; }
@@ -641,26 +648,31 @@
       })();
     }
 
-    /* Accent picker */
+    /* Theme picker: only the 3 web-language colours (JS yellow, HTML red, CSS blue) */
     var dots = $("dots");
-    if (dots) {
-      var colors = [["#ffe21a", "Yellow"], ["#22d3ee", "Cyan"], ["#4ade80", "Green"], ["#f472b6", "Pink"], ["#fb923c", "Orange"]];
-      var cur = (store("sg-accent") || "#ffe21a").toLowerCase();
-      var apply = function (hex) {
-        var rs = root.style;
-        rs.setProperty("--y", hex);
-        rs.setProperty("--yr", parseInt(hex.slice(1, 3), 16) + "," + parseInt(hex.slice(3, 5), 16) + "," + parseInt(hex.slice(5, 7), 16));
-        Array.prototype.forEach.call(dots.children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.c === hex)); });
-      };
-      colors.forEach(function (c) {
-        var b = document.createElement("button");
-        b.type = "button"; b.dataset.c = c[0]; b.style.background = c[0];
-        b.setAttribute("aria-label", c[1] + " accent");
-        b.addEventListener("click", function () { apply(c[0]); store("sg-accent", c[0]); });
-        dots.appendChild(b);
+    var colors = [["#ffe21a", "JavaScript yellow"], ["#cd0d0d", "HTML red"], ["#1b66d2", "CSS blue"]];
+    var apply = function (hex) {
+      var rs = root.style;
+      rs.setProperty("--y", hex);
+      rs.setProperty("--yr", parseInt(hex.slice(1, 3), 16) + "," + parseInt(hex.slice(3, 5), 16) + "," + parseInt(hex.slice(5, 7), 16));
+      rs.setProperty("--on", hex === "#ffe21a" ? "#000" : "#fff");
+      if (dots) Array.prototype.forEach.call(dots.children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.c === hex)); });
+    };
+    var pick = function (c) { apply(c[0]); store("sg-accent", c[0]); toast(c[1]); };
+    if (dots) colors.forEach(function (c) {
+      var b = document.createElement("button");
+      b.type = "button"; b.dataset.c = c[0]; b.style.background = c[0]; b.title = c[1];
+      b.setAttribute("aria-label", c[1] + " accent");
+      b.addEventListener("click", function () { pick(c); });
+      dots.appendChild(b);
+    });
+    document.querySelectorAll("[data-theme]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        pick(colors.filter(function (c) { return c[0] === btn.dataset.theme; })[0]);
       });
-      apply(cur);
-    }
+    });
+    var saved = (store("sg-accent") || "").toLowerCase();
+    apply(colors.some(function (c) { return c[0] === saved; }) ? saved : "#ffe21a");
 
     /* GitHub live stats: fetched only when the card is near the screen, cached for 1 hour */
     var box = $("gh"); if (!box) return;
