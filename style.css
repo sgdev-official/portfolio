@@ -141,6 +141,14 @@ h1{margin:0;font:800 clamp(40px,6.2vw,76px)/1.03 var(--display);letter-spacing:-
 .card:hover .pv4 .gear{animation-duration:3s}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* dev tools card preview */
+.pv5{flex-direction:column;gap:12px}
+.pv5 span{font:800 52px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--y);letter-spacing:-.04em;transition:transform .3s}
+.pv5 i{display:block;width:90px;height:6px;border-radius:9px;background:#222;overflow:hidden}
+.pv5 i::after{content:"";display:block;height:100%;width:40%;background:var(--y);animation:scan 2.2s ease-in-out infinite alternate}
+.card:hover .pv5 span{transform:scale(1.1)}
+@keyframes scan{to{transform:translateX(150%)}}
+
 /* GitHub card */
 .card.gh{grid-column:1/-1;background:radial-gradient(120% 140% at 100% 0,var(--y-dim),transparent 55%),var(--panel)}
 .gh .pb h3{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
