@@ -295,6 +295,11 @@ footer a:hover{color:var(--y)}
   75%{transform:translateX(-6px) rotate(-7deg)}
   90%{transform:translateX(6px) rotate(7deg)}
 }
+.mascot{transition:transform .6s cubic-bezier(.5,0,.3,1),opacity .4s}
+.mascot.away{transform:translateY(130%);opacity:0;pointer-events:none}
+.mascot-spot{position:fixed;left:0;bottom:0;width:120px;height:160px;z-index:39;padding:0;border:0;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mascot-spot[hidden]{display:none}
+@media (max-width:600px){.mascot-spot{width:90px;height:110px}}
 
 /* scroll reveal */
 html.js .rv{opacity:0;transform:translateY(20px);transition:opacity .7s,transform .7s}
