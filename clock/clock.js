@@ -4,10 +4,10 @@
 var Y = '#ffe21a', K = '#000000', TAU = Math.PI * 2;
 function pad(n, l) { n = String(n); l = l || 2; while (n.length < l) n = '0' + n; return n; }
 function ext(a, b) { for (var k in b) if (b.hasOwnProperty(k)) a[k] = b[k]; return a; }
-var DEF = { inv: false, h24: true, smooth: true, roman: false, sound: true, chime: false, tab: 'world', alarms: [], target: '' };
+var DEF = { theme: 'tri', gears: true, h24: true, smooth: true, roman: false, sound: true, chime: false, tab: 'world', alarms: [], target: '' };
 var S = ext({}, DEF);
-try { ext(S, JSON.parse(localStorage.getItem('chrono2') || '{}')); } catch (e) {}
-function save() { try { localStorage.setItem('chrono2', JSON.stringify(S)); } catch (e) {} }
+try { ext(S, JSON.parse(localStorage.getItem('chrono3') || '{}')); } catch (e) {}
+function save() { try { localStorage.setItem('chrono3', JSON.stringify(S)); } catch (e) {} }
 var tnow = (window.performance && window.performance.now) ? function () { return window.performance.now(); } : function () { return +new Date(); };
 var raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
   function (f) { return setTimeout(f, 40); };
@@ -34,6 +34,17 @@ function h(tag, o) {
 }
 function clear(e) { while (e.firstChild) e.removeChild(e.firstChild); }
 
+// ===== themes: red = HTML, blue = CSS, yellow = JS =====
+var HC = '#ca0a0a', CC = '#1423b6';
+var THEMES = {
+  tri:   { fg: Y, bg: K,  a1: HC, a2: CC },
+  js:    { fg: Y, bg: K,  a1: Y,  a2: Y },
+  html:  { fg: Y, bg: HC, a1: Y,  a2: K },
+  css:   { fg: Y, bg: CC, a1: Y,  a2: K },
+  light: { fg: K, bg: Y,  a1: K,  a2: K }
+};
+function TH() { return THEMES[S.theme] || THEMES.tri; }
+
 // ===== styling, all written in JS (no CSS variables, no grid: works on old browsers) =====
 var RULES = [
   ['html,body', 'margin:0;padding:0;min-height:100%'],
@@ -46,14 +57,20 @@ var RULES = [
   ['.left', 'text-align:center'],
   ['@media (max-width:820px)', '.left,.right{display:block;width:100%;padding:0}.right{margin-top:20px}'],
   ['canvas', 'display:block;margin:0 auto;max-width:100%'],
+  ['.gears', 'margin-top:14px;cursor:pointer'],
   ['.big', 'font:bold 52px/1 "Courier New",monospace;letter-spacing:-2px;margin-top:14px'],
   ['@media (min-width:480px)', '.big{font-size:68px}'],
   ['.big small', 'font-size:22px;letter-spacing:0;margin-left:6px'],
   ['.date', 'font-size:18px;margin-top:8px'],
-  ['.meta', 'opacity:.75;font-size:13px;margin-top:4px'],
+  ['.meta', 'opacity:.8;font-size:13px;margin-top:4px'],
   ['.tabs', 'margin-bottom:10px'],
   ['button', 'font:inherit;color:@F;background:transparent;border:2px solid @F;border-radius:999px;padding:6px 13px;margin:3px;cursor:pointer;-webkit-appearance:none'],
   ['button:hover,button.on', 'background:@F;color:@B'],
+  ['.sw', 'width:30px;height:30px;padding:0;vertical-align:middle'],
+  ['.sw.h', 'background:#ca0a0a'], ['.sw.c', 'background:#1423b6'], ['.sw.j', 'background:#ffe21a'],
+  ['.sw.t', 'background:#1423b6;background:-webkit-linear-gradient(left,#ca0a0a 33%,#1423b6 33%,#1423b6 66%,#ffe21a 66%);' +
+    'background:linear-gradient(90deg,#ca0a0a 33%,#1423b6 33%,#1423b6 66%,#ffe21a 66%)'],
+  ['.sw.on', '-webkit-box-shadow:0 0 0 3px @B,0 0 0 5px @F;box-shadow:0 0 0 3px @B,0 0 0 5px @F'],
   ['input', 'font:inherit;color:@F;background:@B;border:2px solid @F;border-radius:10px;padding:7px 10px;width:120px;margin:3px'],
   ['.panel', 'border:2px solid @F;border-radius:22px;padding:16px;min-height:380px'],
   ['.row', 'padding:9px 0;border-bottom:1px dotted @F;overflow:hidden'],
@@ -63,7 +80,9 @@ var RULES = [
   ['.btns', 'text-align:center;margin:8px 0'],
   ['.bar', 'height:12px;border:2px solid @F;border-radius:8px;overflow:hidden;margin:5px 0 12px'],
   ['.bar i', 'display:block;height:100%;background:@F'],
-  ['.mini', 'margin:16px auto 0;max-width:340px;border:2px solid @F;border-radius:18px;padding:10px'],
+  ['.bc', 'display:inline-block;width:15%;text-align:center;vertical-align:bottom'],
+  ['.bd', 'display:block;width:26px;height:26px;border:2px solid @F;border-radius:50%;margin:7px auto'],
+  ['.mini', 'margin:14px auto 0;max-width:340px;border:2px solid @F;border-radius:18px;padding:10px'],
   ['.hd', 'overflow:hidden;line-height:34px;font-weight:bold;text-align:center'],
   ['.hd button', 'padding:1px 12px;margin:0'],
   ['.cell', 'display:inline-block;width:14.28%;text-align:center;padding:6px 0;border-radius:8px;font-size:14px;cursor:pointer;border:2px solid transparent'],
@@ -76,21 +95,19 @@ var RULES = [
   ['.ring', 'position:fixed;top:0;left:0;right:0;z-index:9;text-align:center;background:@F;color:@B;padding:14px;font-weight:bold;display:none'],
   ['.ring.inv', 'background:@B;color:@F'],
   ['.ring button', 'color:@B;border-color:@B'],
-  ['.ring.inv button', 'color:@F;border-color:@F'],
-  ['.note', 'background:@F;color:@B;padding:6px 10px;font-size:13px;text-align:center']
+  ['.ring.inv button', 'color:@F;border-color:@F']
 ];
 var styleEl = document.createElement('style'); styleEl.type = 'text/css';
 document.getElementsByTagName('head')[0].appendChild(styleEl);
 function buildCSS() {
-  var fg = S.inv ? K : Y, bg = S.inv ? Y : K, out = '';
+  var t = TH(), out = '';
   for (var i = 0; i < RULES.length; i++) out += RULES[i][0] + '{' + RULES[i][1] + '}';
-  return out.replace(/@F/g, fg).replace(/@B/g, bg);
+  return out.replace(/@F/g, t.fg).replace(/@B/g, t.bg);
 }
 function applyTheme() {
-  var t = buildCSS();
+  var t = buildCSS(), th = TH();
   if (styleEl.styleSheet) styleEl.styleSheet.cssText = t; else styleEl.textContent = t;
-  document.body.style.background = S.inv ? Y : K;
-  document.body.style.color = S.inv ? K : Y;
+  document.body.style.background = th.bg; document.body.style.color = th.fg;
 }
 
 // ===== sound =====
@@ -130,29 +147,52 @@ function dateStr(d) { return DAYS[d.getDay()].slice(0, 3) + ' ' + d.getDate() + 
 // ===== layout =====
 var test = document.createElement('canvas');
 if (!(test.getContext && test.getContext('2d'))) throw new Error('canvas is not supported');
-var cv = h('canvas', { 'aria-label': 'Analog clock with moon phase and sub-dials' });
-var bigEl = h('div', { className: 'big mono' });
+var calOpen = false;
+var cv = h('canvas', { 'aria-label': 'Analog clock with gears, moon phase and sub-dials' });
+var gv = h('canvas', { className: 'gears', 'aria-label': 'Rotating gears for HTML, CSS and JS' });
+var bigEl = h('div', { className: 'big mono', title: 'Tap to show or hide the calendar', style: { cursor: 'pointer' }, onclick: function () { setCal(!calOpen); } });
 var dateEl = h('div', { className: 'date' });
 var metaEl = h('div', { className: 'meta' });
+var topRow = h('div', { className: 'btns' });
 var miniEl = h('div', { className: 'mini' });
 var miniInfo = h('div', { className: 'meta', style: { textAlign: 'center' } });
+var gearNote = h('div', { className: 'meta', style: { textAlign: 'center' } }, 'Tap the gears to spin them faster');
 var ring = h('div', { className: 'ring' });
 var tabsEl = h('div', { className: 'tabs' });
 var panel = h('div', { className: 'panel' });
+var SW = [['h', 'html', 'HTML'], ['c', 'css', 'CSS'], ['j', 'js', 'JS'], ['t', 'tri', 'Tri-colour']];
+function setCal(v) {
+  calOpen = v; miniEl.style.display = v ? 'block' : 'none'; miniInfo.style.display = v ? 'block' : 'none'; drawTop();
+}
+function setTheme(n) { S.theme = n; save(); applyTheme(); drawTop(); if (S.tab === 'settings') renderTab(); }
+function applyGearVis() { var v = S.gears ? 'block' : 'none'; gv.style.display = v; gearNote.style.display = v; }
+function drawTop() {
+  clear(topRow);
+  topRow.appendChild(h('button', { className: calOpen ? 'on' : '', onclick: function () { setCal(!calOpen); } }, 'Calendar'));
+  for (var i = 0; i < SW.length; i++) (function (x) {
+    topRow.appendChild(h('button', { className: 'sw ' + x[0] + (S.theme === x[1] ? ' on' : ''), title: x[2] + ' theme',
+      'aria-label': x[2] + ' theme', onclick: function () { setTheme(x[1]); } }));
+  })(SW[i]);
+}
 applyTheme();
 document.body.appendChild(ring);
 document.body.appendChild(h('div', { className: 'app' },
-  h('div', { className: 'left' }, cv, h('div', {}, bigEl, dateEl, metaEl), miniEl, miniInfo),
+  h('div', { className: 'left' }, cv, h('div', {}, bigEl, dateEl, metaEl), topRow, miniEl, miniInfo, gv, gearNote),
   h('div', { className: 'right' }, tabsEl, panel)));
-var ctx = cv.getContext('2d'), Z = 320, dpr = 1;
+var ctx = cv.getContext('2d'), gctx = gv.getContext('2d'), Z = 320, GH = 200, dpr = 1;
 function resize() {
   dpr = window.devicePixelRatio || 1;
   var w = cv.parentNode.clientWidth || 320;
-  Z = Math.max(240, Math.min(560, w));
+  Z = Math.max(240, Math.min(560, w)); GH = Math.floor(Z * 0.62);
   cv.width = Math.floor(Z * dpr); cv.height = Math.floor(Z * dpr);
   cv.style.width = Z + 'px'; cv.style.height = Z + 'px';
+  gv.width = Math.floor(Z * dpr); gv.height = Math.floor(GH * dpr);
+  gv.style.width = Z + 'px'; gv.style.height = GH + 'px';
 }
 on(window, 'resize', resize);
+var gAng = 0, gLast = 0, gBoost = 1;
+on(gv, 'click', function () { gBoost = 12; });
+drawTop(); setCal(false); applyGearVis();
 
 // ===== analog drawing =====
 function pt(cx, cy, r, a) { return [cx + Math.cos(a - Math.PI / 2) * r, cy + Math.sin(a - Math.PI / 2) * r]; }
@@ -187,21 +227,96 @@ function drawMoon(c, x, y, r, p, fg, bg) {
   c.restore(); c.fill(); c.restore();
   c.strokeStyle = fg; c.lineWidth = r * 0.08; c.beginPath(); c.arc(x, y, r, 0, TAU); c.stroke();
 }
+function gearPath(c, x, y, n, m, ang) {
+  var r = n * m / 2, ro = r + m * 0.6, rr = r - m * 0.7, p = TAU / n, i, b;
+  c.beginPath();
+  for (i = 0; i < n; i++) {
+    b = ang + i * p;
+    c[i ? 'lineTo' : 'moveTo'](x + Math.cos(b - 0.27 * p) * rr, y + Math.sin(b - 0.27 * p) * rr);
+    c.lineTo(x + Math.cos(b - 0.13 * p) * ro, y + Math.sin(b - 0.13 * p) * ro);
+    c.lineTo(x + Math.cos(b + 0.13 * p) * ro, y + Math.sin(b + 0.13 * p) * ro);
+    c.lineTo(x + Math.cos(b + 0.27 * p) * rr, y + Math.sin(b + 0.27 * p) * rr);
+  }
+  c.closePath();
+}
+function gear(c, x, y, n, m, ang, col, fa, lw, bg, edge) {
+  var r = n * m / 2, sp = n > 14 ? 6 : 4, i, a, g = c.globalAlpha;
+  gearPath(c, x, y, n, m, ang);
+  c.globalAlpha = g * fa; c.fillStyle = col; c.fill(); c.globalAlpha = g;
+  c.strokeStyle = col; c.lineWidth = lw; c.lineJoin = 'round'; c.stroke();
+  if (edge && edge !== col) { c.strokeStyle = edge; c.lineWidth = Math.max(1, lw * 0.25); c.stroke(); }
+  c.strokeStyle = col; c.lineWidth = lw * 0.7; c.beginPath(); c.arc(x, y, r * 0.58, 0, TAU); c.stroke();
+  for (i = 0; i < sp; i++) {
+    a = ang + i / sp * TAU;
+    line(c, x + Math.cos(a) * r * 0.2, y + Math.sin(a) * r * 0.2, x + Math.cos(a) * r * 0.58, y + Math.sin(a) * r * 0.58, lw * 0.7);
+  }
+  c.fillStyle = bg; c.beginPath(); c.arc(x, y, r * 0.2, 0, TAU); c.fill(); c.stroke();
+}
+// gear train: JS (yellow) drives HTML (red) which drives CSS (blue); small gears hang off them
+var TRAIN = [
+  { n: 24, x: 0.19, y: 0.30, p: -1, k: 'j', lab: 'JS' },
+  { n: 18, p: 0, phi: 0, k: 'h', lab: 'HTML' },
+  { n: 30, p: 1, phi: 0.35, k: 'c', lab: 'CSS' },
+  { n: 10, p: 0, phi: 1.9, k: 'j' },
+  { n: 12, p: 2, phi: -1.1, k: 'h' },
+  { n: 8, p: 1, phi: -1.5708, k: 'c' }
+];
+function drawGears(tms) {
+  var T = TH(), c = gctx, W = Z, m = W / 160, i, g, par, pr, r, col, pos = [], ang = [];
+  var dt = gLast ? Math.min(0.1, (tms - gLast) / 1000) : 0; gLast = tms;
+  gBoost = 1 + (gBoost - 1) * Math.exp(-dt * 1.2);
+  gAng += dt * TAU / 24 * gBoost;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.globalAlpha = 1;
+  c.fillStyle = T.bg; c.fillRect(0, 0, W, GH);
+  for (i = 0; i < TRAIN.length; i++) {
+    g = TRAIN[i]; r = g.n * m / 2;
+    if (g.p < 0) { pos[i] = [g.x * W, g.y * W]; ang[i] = gAng; }
+    else {
+      par = TRAIN[g.p]; pr = par.n * m / 2;
+      pos[i] = [pos[g.p][0] + Math.cos(g.phi) * (pr + r), pos[g.p][1] + Math.sin(g.phi) * (pr + r)];
+      ang[i] = g.phi + Math.PI - (TAU / g.n) * (0.5 - (g.phi - ang[g.p]) / (TAU / par.n));
+    }
+    col = g.k === 'h' ? T.a1 : g.k === 'c' ? T.a2 : T.fg;
+    gear(c, pos[i][0], pos[i][1], g.n, m, ang[i], col, col === T.fg ? 0.22 : 0.45, Math.max(1.5, W * 0.006), T.bg, T.fg);
+    if (g.lab) {
+      c.font = 'bold ' + Math.floor(r * 0.36) + 'px "Courier New",monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.lineWidth = 4; c.strokeStyle = T.bg; c.strokeText(g.lab, pos[i][0], pos[i][1]);
+      c.fillStyle = T.fg; c.fillText(g.lab, pos[i][0], pos[i][1]);
+    }
+  }
+}
+function arcAt(c, cx, cy, r, col, w) { c.strokeStyle = col; c.lineWidth = w; c.beginPath(); c.arc(cx, cy, r, 0, TAU); c.stroke(); }
 function drawClock(d) {
-  var fg = S.inv ? K : Y, bg = S.inv ? Y : K, c = ctx, i, a, p1, p2;
-  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  var T = TH(), fg = T.fg, bg = T.bg, a1 = T.a1, a2 = T.a2, c = ctx, i, a, p1, p2;
+  var tm = d.getTime() / 1000;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.globalAlpha = 1;
   c.clearRect(0, 0, Z, Z); c.fillStyle = bg; c.fillRect(0, 0, Z, Z);
   var cx = Z / 2, cy = Z / 2, R = Z / 2 * 0.95;
   var sec = d.getSeconds() + (S.smooth ? d.getMilliseconds() / 1000 : 0);
   var min = d.getMinutes() + sec / 60, hr = d.getHours() % 12 + min / 60;
-  c.strokeStyle = fg; c.fillStyle = fg; c.lineCap = 'butt';
-  c.lineWidth = R * 0.035; c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
-  c.lineWidth = R * 0.01; c.beginPath(); c.arc(cx, cy, R * 0.93, 0, TAU); c.stroke();
+  // skeleton gear behind the dial and four small gears in the corners
+  c.globalAlpha = 0.18; gear(c, cx, cy, 48, R * 0.0209, tm * TAU / 48 * 0.4, fg, 0, R * 0.006, bg); c.globalAlpha = 1;
+  var dg = [[1, -1], [1, 1], [-1, 1], [-1, -1]];
+  for (i = 0; i < 4; i++) {
+    gear(c, cx + dg[i][0] * R * 0.27, cy + dg[i][1] * R * 0.27, 14, R * 0.0125, (i % 2 ? -1 : 1) * tm * TAU / 14 * 0.9 + i,
+      i % 2 ? a2 : a1, 0.3, R * 0.01, bg, fg);
+  }
+  // triple bezel: blue (CSS), red (HTML), yellow (JS)
+  c.lineCap = 'butt';
+  arcAt(c, cx, cy, R * 0.985, a2, R * 0.04);
+  arcAt(c, cx, cy, R * 1.005, fg, R * 0.008);
+  arcAt(c, cx, cy, R * 0.965, fg, R * 0.008);
+  arcAt(c, cx, cy, R * 0.945, a1, R * 0.018);
+  arcAt(c, cx, cy, R * 0.93, fg, R * 0.006);
+  c.strokeStyle = fg; c.fillStyle = fg;
+  var ws = Math.floor(sec);
   for (i = 0; i < 60; i++) {
     var big = i % 5 === 0; a = i / 60 * TAU;
+    c.globalAlpha = big || i <= ws ? 1 : 0.4;
     p1 = pt(cx, cy, R * 0.9, a); p2 = pt(cx, cy, R * (big ? 0.82 : 0.86), a);
     line(c, p1[0], p1[1], p2[0], p2[1], big ? R * 0.025 : R * 0.008);
   }
+  c.globalAlpha = 1; c.fillStyle = fg;
   for (i = 0; i < 12; i++) {
     p1 = pt(cx, cy, R * 0.72, i / 12 * TAU);
     label(c, S.roman ? ROMAN[i] : String(i || 12), p1[0], p1[1], R * (S.roman ? 0.09 : 0.11), true);
@@ -209,28 +324,33 @@ function drawClock(d) {
   var sr = R * 0.17, off = R * 0.38, wl = [], ml = [], w = 'SMTWTFS', m = 'JFMAMJJASOND';
   for (i = 0; i < 7; i++) wl.push([i, w.charAt(i)]);
   for (i = 0; i < 12; i += 3) ml.push([i, m.charAt(i)]);
+  c.globalAlpha = 0.25; c.fillStyle = fg; c.beginPath(); c.moveTo(cx, cy - off);
+  c.arc(cx, cy - off, sr * 0.97, 0.75 * TAU - Math.PI / 2, 0.25 * TAU - Math.PI / 2 + TAU, false); c.closePath(); c.fill(); c.globalAlpha = 1;
   subdial(c, cx, cy - off, sr, 24, [[0, '0'], [6, '6'], [12, '12'], [18, '18']], d.getHours() + d.getMinutes() / 60, fg);
   subdial(c, cx - off, cy, sr, 7, wl, d.getDay() + d.getHours() / 24, fg);
   subdial(c, cx + off, cy, sr, 12, ml, d.getMonth() + d.getDate() / 31, fg);
   drawMoon(c, cx, cy + off, sr * 0.82, moonPhase(d.getTime()), fg, bg);
   c.fillStyle = fg; label(c, pad(d.getDate()), cx, cy + off + sr * 1.45, R * 0.075, true);
   for (i = 0; i < 24; i++) {
-    c.globalAlpha = (1 - i / 24) * 0.5; c.strokeStyle = fg; c.lineWidth = R * 0.02;
+    c.globalAlpha = (1 - i / 24) * 0.55; c.strokeStyle = fg; c.lineWidth = R * 0.018;
     a = (sec - i * 0.4) / 60 * TAU - Math.PI / 2;
-    c.beginPath(); c.arc(cx, cy, R * 0.97, a - 0.03, a, false); c.stroke();
+    c.beginPath(); c.arc(cx, cy, R * 0.945, a - 0.03, a, false); c.stroke();
   }
-  c.globalAlpha = 1; c.strokeStyle = fg; c.fillStyle = fg; c.lineCap = 'round';
+  c.globalAlpha = 1; c.lineCap = 'round';
+  var in1 = a1 === fg ? bg : a1, in2 = a2 === fg ? bg : a2;
+  c.strokeStyle = fg; c.fillStyle = fg;
   a = hr / 12 * TAU; p1 = pt(cx, cy, R * 0.5, a); p2 = pt(cx, cy, -R * 0.1, a);
-  line(c, p2[0], p2[1], p1[0], p1[1], R * 0.055);
-  c.strokeStyle = bg; line(c, p2[0], p2[1], p1[0], p1[1], R * 0.02); c.strokeStyle = fg;
+  line(c, p2[0], p2[1], p1[0], p1[1], R * 0.06);
+  c.strokeStyle = in1; line(c, p2[0], p2[1], p1[0], p1[1], R * 0.03); c.strokeStyle = fg;
   a = min / 60 * TAU; p1 = pt(cx, cy, R * 0.76, a); p2 = pt(cx, cy, -R * 0.1, a);
-  line(c, p2[0], p2[1], p1[0], p1[1], R * 0.04);
-  c.strokeStyle = bg; line(c, p2[0], p2[1], p1[0], p1[1], R * 0.012); c.strokeStyle = fg;
+  line(c, p2[0], p2[1], p1[0], p1[1], R * 0.045);
+  c.strokeStyle = in2; line(c, p2[0], p2[1], p1[0], p1[1], R * 0.02); c.strokeStyle = fg;
   a = sec / 60 * TAU; p1 = pt(cx, cy, R * 0.88, a); p2 = pt(cx, cy, -R * 0.2, a);
   line(c, p2[0], p2[1], p1[0], p1[1], R * 0.012);
-  p1 = pt(cx, cy, R * 0.6, a); c.beginPath(); c.arc(p1[0], p1[1], R * 0.03, 0, TAU); c.fill();
-  c.beginPath(); c.arc(cx, cy, R * 0.045, 0, TAU); c.fill();
-  c.fillStyle = bg; c.beginPath(); c.arc(cx, cy, R * 0.016, 0, TAU); c.fill();
+  p1 = pt(cx, cy, R * 0.6, a); c.fillStyle = a1 === fg ? fg : a1; c.strokeStyle = fg; c.lineWidth = R * 0.008;
+  c.beginPath(); c.arc(p1[0], p1[1], R * 0.03, 0, TAU); c.fill(); c.stroke();
+  c.fillStyle = fg; c.beginPath(); c.arc(cx, cy, R * 0.05, 0, TAU); c.fill();
+  c.fillStyle = a1 === fg ? bg : a1; c.beginPath(); c.arc(cx, cy, R * 0.022, 0, TAU); c.fill();
 }
 
 // ===== digital readout =====
@@ -531,7 +651,7 @@ views.countdown = (function () {
 })();
 
 views.progress = (function () {
-  var bars = [], info, moon;
+  var bars = [], info, moon, extra;
   function frac(a, b, n) { return Math.max(0, Math.min(100, 100 * (n - a) / (b - a))); }
   return {
     build: function (root) {
@@ -541,10 +661,12 @@ views.progress = (function () {
         root.appendChild(h('div', {}, lb, names[i], h('div', { className: 'bar' }, b))); bars.push({ b: b, l: lb });
       }
       info = h('p', { className: 'meta' }); moon = h('p', { className: 'meta' });
-      root.appendChild(info); root.appendChild(moon);
+      extra = h('p', { className: 'meta' }); root.appendChild(info); root.appendChild(moon); root.appendChild(extra);
     },
     tick: function (d) {
       var y = d.getFullYear(), mo = d.getMonth(), da = d.getDate(), n = d.getTime(), wd = (d.getDay() + 6) % 7;
+      extra.textContent = 'Unix time ' + Math.floor(n / 1000) + ' | Julian date ' + (n / 864e5 + 2440587.5).toFixed(4) +
+        ' | Internet beat @' + (((n + 3600000) % 864e5) / 86400).toFixed(2);
       var v = [frac(new Date(y, mo, da), new Date(y, mo, da + 1), n), frac(new Date(y, mo, da - wd), new Date(y, mo, da - wd + 7), n),
         frac(new Date(y, mo, 1), new Date(y, mo + 1, 1), n), frac(new Date(y, 0, 1), new Date(y + 1, 0, 1), n), moonPhase(n) * 100];
       for (var i = 0; i < 5; i++) { bars[i].b.style.width = v[i] + '%'; bars[i].l.textContent = v[i].toFixed(2) + '%'; }
@@ -552,6 +674,36 @@ views.progress = (function () {
       info.textContent = 'Day ' + dayOfYear(d) + ' of ' + total + ', ' + (total - dayOfYear(d)) + ' days left. ISO week ' + isoWeek(d) + '. ' + (leap ? 'Leap year.' : 'Not a leap year.');
       var p = moonPhase(n), full = new Date(n + ((0.5 - p + 1) % 1) * SYN * 864e5), nw = new Date(n + ((1 - p) % 1 || 1) * SYN * 864e5);
       moon.textContent = moonName(p) + ', ' + Math.round(illum(p) * 100) + '% lit. Next full moon about ' + dateStr(full) + ', next new moon about ' + dateStr(nw) + '.';
+    }
+  };
+})();
+
+views.binary = (function () {
+  var SPEC = [[2, 0], [4, 0], [3, 1], [4, 1], [3, 2], [4, 2]], cols = [], txt;
+  return {
+    build: function (root) {
+      cols = []; var wrap = h('div', { className: 'btns' }, ''), i, j, col, dots, dot;
+      for (i = 0; i < 6; i++) {
+        col = h('div', { className: 'bc' }); dots = [];
+        for (j = 0; j < 4; j++) {
+          dot = h('span', { className: 'bd' });
+          if (j < 4 - SPEC[i][0]) dot.style.visibility = 'hidden';
+          col.appendChild(dot); dots.push(dot);
+        }
+        col.appendChild(h('div', { className: 'meta' }, 'HHMMSS'.charAt(i)));
+        wrap.appendChild(col); cols.push(dots);
+      }
+      txt = h('div', { className: 'huge', style: { fontSize: '30px' } });
+      root.appendChild(wrap); root.appendChild(txt);
+      root.appendChild(h('p', { className: 'meta' }, 'Every column is one digit in binary. From the top the dots are worth 8, 4, 2 and 1. Red is hours, blue is minutes, yellow is seconds.'));
+    },
+    tick: function (d) {
+      var T = TH(), s = pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()), pal = [T.a1, T.a2, T.fg], i, j, v;
+      for (i = 0; i < 6; i++) {
+        v = +s.charAt(i);
+        for (j = 0; j < 4; j++) cols[i][j].style.background = (v & (8 >> j)) ? pal[SPEC[i][1]] : 'transparent';
+      }
+      txt.textContent = s.slice(0, 2) + ':' + s.slice(2, 4) + ':' + s.slice(4, 6);
     }
   };
 })();
@@ -565,26 +717,33 @@ function toggleFS() {
 }
 views.settings = {
   build: function (root) {
+    var th = [['tri', 'Tri-colour'], ['js', 'JS'], ['html', 'HTML'], ['css', 'CSS'], ['light', 'Light']], tb = [], i;
+    for (i = 0; i < th.length; i++) (function (k, t) {
+      tb.push(h('button', { className: S.theme === k ? 'on' : '', onclick: function () { setTheme(k); } }, t));
+    })(th[i][0], th[i][1]);
+    root.appendChild(h('div', { className: 'btns' }, tb));
+    root.appendChild(h('p', { className: 'meta', style: { textAlign: 'center' } }, 'Red is HTML, blue is CSS and yellow is JS. Tri-colour uses all three.'));
     var opts = [['h24', '24-hour time'], ['smooth', 'Smooth seconds hand'], ['roman', 'Roman numerals'],
-      ['inv', 'Invert colours (black on yellow)'], ['sound', 'Sound for alarms and timers'], ['chime', 'Chime on the hour']];
-    for (var i = 0; i < opts.length; i++) (function (k, t) {
+      ['gears', 'Rotating gears'], ['sound', 'Sound for alarms and timers'], ['chime', 'Chime on the hour']];
+    for (i = 0; i < opts.length; i++) (function (k, t) {
       var b = h('button', { className: 'fr' });
       function paint() { b.textContent = S[k] ? 'On' : 'Off'; b.className = 'fr' + (S[k] ? ' on' : ''); }
-      b.onclick = function () { S[k] = !S[k]; save(); applyTheme(); paint(); };
+      b.onclick = function () { S[k] = !S[k]; save(); if (k === 'gears') applyGearVis(); paint(); };
       paint(); root.appendChild(h('div', { className: 'row' }, b, t));
     })(opts[i][0], opts[i][1]);
     root.appendChild(h('div', { className: 'row' }, h('button', { className: 'fr', onclick: toggleFS }, 'Toggle'), 'Fullscreen'));
     root.appendChild(h('div', { className: 'row' }, h('button', { className: 'fr', onclick: function () {
-      S.alarms = []; S.target = ''; S.inv = false; S.h24 = true; S.smooth = true; S.roman = false; S.chime = false; save(); applyTheme(); renderTab();
+      S.alarms = []; S.target = ''; S.theme = 'tri'; S.h24 = true; S.smooth = true; S.roman = false; S.chime = false; S.gears = true;
+      save(); applyTheme(); applyGearVis(); drawTop(); renderTab();
     } }, 'Reset'), 'Reset all saved settings'));
-    root.appendChild(h('p', { className: 'meta' }, 'Keys: 1-8 switch tabs, H 12/24h, I invert, F fullscreen, Space start or pause, L lap, Esc stop alarm.'));
+    root.appendChild(h('p', { className: 'meta' }, 'Keys: 1-9 tabs, T next theme, C calendar, G gears, H 12/24h, I light theme, F fullscreen, Space start or pause, L lap, Esc stop alarm.'));
   },
   tick: function () {}
 };
 
 // ===== tabs =====
 var TABS = [['world', 'World'], ['stopwatch', 'Stopwatch'], ['timer', 'Timer'], ['alarm', 'Alarms'],
-  ['pomodoro', 'Pomodoro'], ['countdown', 'Countdown'], ['progress', 'Progress'], ['settings', 'Settings']];
+  ['pomodoro', 'Pomodoro'], ['countdown', 'Countdown'], ['progress', 'Progress'], ['binary', 'Binary'], ['settings', 'Settings']];
 function renderTabs() {
   clear(tabsEl);
   for (var i = 0; i < TABS.length; i++) (function (k, t, n) {
@@ -603,10 +762,13 @@ on(document, 'keydown', function (e) {
   if (/INPUT|TEXTAREA|SELECT/.test(tg) || e.metaKey || e.ctrlKey) return;
   var code = e.keyCode || e.which, k = e.key ? String(e.key).toLowerCase() : String.fromCharCode(code).toLowerCase();
   if (code === 32) k = 'space'; if (code === 27) k = 'escape';
-  var n = parseInt(k, 10);
+  var n = parseInt(k, 10), order = ['tri', 'js', 'html', 'css', 'light'];
   if (n >= 1 && n <= TABS.length) { S.tab = TABS[n - 1][0]; save(); renderTab(); }
   else if (k === 'h') { S.h24 = !S.h24; save(); if (S.tab === 'settings') renderTab(); }
-  else if (k === 'i') { S.inv = !S.inv; save(); applyTheme(); if (S.tab === 'settings') renderTab(); }
+  else if (k === 'i') setTheme(S.theme === 'light' ? 'tri' : 'light');
+  else if (k === 't') setTheme(order[(order.indexOf(S.theme) + 1) % order.length]);
+  else if (k === 'c') setCal(!calOpen);
+  else if (k === 'g') { S.gears = !S.gears; save(); applyGearVis(); if (S.tab === 'settings') renderTab(); }
   else if (k === 'f') toggleFS();
   else if (k === 'escape') stopRing();
   else if (k === 'space' && views[S.tab].toggle) { if (e.preventDefault) e.preventDefault(); views[S.tab].toggle(); }
@@ -614,16 +776,18 @@ on(document, 'keydown', function (e) {
 });
 
 // ===== main loop =====
-var lastSec = -1, lastText = 0, lastDay = -1;
+var lastSec = -1, lastText = 0, lastDay = -1, failed = false;
 function frame() {
   try {
     var d = new Date();
     if (S.smooth || d.getSeconds() !== lastSec) drawClock(d);
+    if (S.gears) drawGears(tnow());
     if (d.getDate() !== lastDay) { lastDay = d.getDate(); if (!mini.sel) showToday(); else drawMini(); }
     if (d.getSeconds() !== lastSec) { lastSec = d.getSeconds(); checkAlarms(d); }
     var t = tnow();
     if (t - lastText > 90) { lastText = t; updateDigital(d); views[S.tab].tick(d); }
   } catch (err) {
+    failed = true;
     if (window.ChronoBasic) window.ChronoBasic.show('Full clock stopped (' + (err && err.message) + '). Showing the basic clock.');
     return;
   }
@@ -631,8 +795,7 @@ function frame() {
 }
 try {
   resize(); showToday(); renderTab(); frame();
-  window.ChronoOK = true;
-  if (window.ChronoBasic) window.ChronoBasic.hide();
+  if (!failed) { window.ChronoOK = true; if (window.ChronoBasic) window.ChronoBasic.hide(); }
 } catch (err) {
   if (window.ChronoBasic) window.ChronoBasic.show('Full clock could not start (' + (err && err.message) + '). Showing the basic clock.');
 }
