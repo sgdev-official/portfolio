@@ -278,6 +278,8 @@ footer a:hover{color:var(--y)}
 .dots button{width:18px;height:18px;padding:0;border:2px solid transparent;border-radius:50%;cursor:pointer;transition:transform .15s}
 .dots button:hover{transform:scale(1.18)}
 .dots button[aria-pressed=true]{border-color:#fff}
+.dock #cmdk{height:34px;padding:0 11px;border:1.5px solid var(--line);border-radius:999px;background:transparent;color:var(--text);font:600 12.5px var(--body);cursor:pointer;transition:border-color .2s,color .2s}
+.dock #cmdk:hover{border-color:var(--y);color:var(--y)}
 .dock #up{width:34px;height:34px;border:0;border-radius:50%;background:var(--y);color:var(--on);font-size:17px;font-weight:800;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:70;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:11px 20px;background:var(--y);color:var(--on);border-radius:999px;font-weight:600;font-size:14px;transition:opacity .25s,transform .25s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
