@@ -93,13 +93,26 @@
     items.forEach(function (el) { el.classList.add("in"); });
   }
 
-  /* ---------- 3b. Dancing mascot ---------- */
+  /* ---------- 3b. Dancing mascot (hides after a while, click the corner to bring it back) ---------- */
   (function () {
-    var m = $("mascot"), t = 0; if (!m) return;
+    var m = $("mascot"), spot = $("mascotSpot"), t = 0, hideT = 0, SHOW_MS = 12000;
+    if (!m || !spot) return;
+    function arm() { clearTimeout(hideT); hideT = setTimeout(hide, SHOW_MS); }
+    function hide() {
+      m.classList.add("away"); m.classList.remove("hype");
+      m.tabIndex = -1; spot.hidden = false;
+    }
+    function show() {
+      m.classList.remove("away"); m.tabIndex = 0;
+      spot.hidden = true; arm();
+    }
     m.addEventListener("click", function () {
       m.classList.add("hype"); toast("Splash! 🌊");
       clearTimeout(t); t = setTimeout(function () { m.classList.remove("hype"); }, 2500);
+      arm();   /* interacting keeps it around a bit longer */
     });
+    spot.addEventListener("click", function () { show(); toast("Splash is back! 🌊"); });
+    arm();
   })();
 
   /* ---------- 4. Fidget spinner ---------- */
