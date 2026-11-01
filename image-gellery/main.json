@@ -1,9 +1,9 @@
 {
   "app": {
-    "name": "BEARING BEAR",
-    "tagline": "Gallery + AI image maker",
+    "name": "SG DEV PORTFOLIO IMAGE GALLERY",
+    "tagline": "Gallery + image maker",
     "pageSize": 24,
-    "backgroundTiles": 90
+    "backgroundTiles": 48
   },
   "palette": {
     "yellow": "#ffe21a",
@@ -16,39 +16,100 @@
     "body": "'Trebuchet MS', 'Segoe UI', Verdana, sans-serif"
   },
   "sources": [
-    { "id": "unsplash", "label": "Unsplash", "weight": 4,
-      "queries": ["bear", "grizzly bear", "polar bear", "ball bearing", "steel bearings", "machinery gears", "teddy bear", "brown bear forest"] },
-    { "id": "robohash", "label": "Robohash", "weight": 3,
-      "sets": ["set1", "set2", "set3", "set4", "set5"], "bgsets": ["bg1", "bg2"] },
-    { "id": "pollinations", "label": "Pollinations", "weight": 3,
-      "prompts": [
-        "bear made of ball bearings, chrome, studio light",
-        "giant bear in yellow red blue pop art",
-        "steel ball bearing macro, shiny, black background",
-        "robot bear mechanic, comic style",
-        "polar bear on red mountain, flat poster",
-        "bear head built from gears and bearings, blueprint",
-        "yellow bear in a neon city, cinematic"
-      ] }
+    {
+      "id": "unsplash",
+      "label": "Unsplash",
+      "weight": 3,
+      "seeds": [
+        "bear",
+        "bearing",
+        "gear",
+        "forest",
+        "steel",
+        "mountain",
+        "machine",
+        "wild"
+      ]
+    },
+    {
+      "id": "robohash",
+      "label": "Robohash",
+      "weight": 5,
+      "sets": [
+        "set1",
+        "set2",
+        "set3",
+        "set4",
+        "set5"
+      ],
+      "bgsets": [
+        "bg1",
+        "bg2"
+      ]
+    }
   ],
   "generator": {
     "endpoint": "https://image.pollinations.ai/prompt/",
-    "models": ["flux", "turbo", "gptimage"],
+    "models": [
+      "flux",
+      "turbo"
+    ],
     "sizes": [
-      { "label": "Square 1024", "w": 1024, "h": 1024 },
-      { "label": "Portrait 768x1024", "w": 768, "h": 1024 },
-      { "label": "Landscape 1024x768", "w": 1024, "h": 768 },
-      { "label": "Wide 1280x720", "w": 1280, "h": 720 },
-      { "label": "Small 512", "w": 512, "h": 512 }
+      {
+        "label": "Square 1024",
+        "w": 1024,
+        "h": 1024
+      },
+      {
+        "label": "Portrait 768x1024",
+        "w": 768,
+        "h": 1024
+      },
+      {
+        "label": "Landscape 1024x768",
+        "w": 1024,
+        "h": 768
+      },
+      {
+        "label": "Wide 1280x720",
+        "w": 1280,
+        "h": 720
+      },
+      {
+        "label": "Small 512",
+        "w": 512,
+        "h": 512
+      }
     ],
     "styles": [
-      { "label": "None", "suffix": "" },
-      { "label": "Pop art", "suffix": ", bold pop art, halftone dots, flat colours" },
-      { "label": "Photo", "suffix": ", ultra realistic photo, 85mm, soft light" },
-      { "label": "Blueprint", "suffix": ", technical blueprint drawing, white lines on blue" },
-      { "label": "Chrome 3D", "suffix": ", glossy chrome 3d render, studio lighting" },
-      { "label": "Comic", "suffix": ", comic book ink, thick outlines, red yellow blue" },
-      { "label": "Sticker", "suffix": ", die-cut sticker, white border, vector" }
+      {
+        "label": "None",
+        "suffix": ""
+      },
+      {
+        "label": "Pop art",
+        "suffix": ", bold pop art, halftone dots, flat colours"
+      },
+      {
+        "label": "Photo",
+        "suffix": ", ultra realistic photo, 85mm, soft light"
+      },
+      {
+        "label": "Blueprint",
+        "suffix": ", technical blueprint drawing, white lines on blue"
+      },
+      {
+        "label": "Chrome 3D",
+        "suffix": ", glossy chrome 3d render, studio lighting"
+      },
+      {
+        "label": "Comic",
+        "suffix": ", comic book ink, thick outlines, red yellow blue"
+      },
+      {
+        "label": "Sticker",
+        "suffix": ", die-cut sticker, white border, vector"
+      }
     ],
     "randomPrompts": [
       "a bear balancing on a giant ball bearing",
@@ -58,6 +119,39 @@
       "a bearing factory run by tiny bears",
       "a bear astronaut floating over a black planet",
       "a bear lighthouse in a storm of yellow lightning"
+    ],
+    "cooldownSeconds": 45,
+    "engines": [
+      {
+        "id": "robohash",
+        "label": "Robohash (instant, no limit)"
+      },
+      {
+        "id": "pollinations",
+        "label": "Pollinations AI (1 image every 45 s)"
+      }
+    ],
+    "characters": [
+      {
+        "id": "set1",
+        "label": "Robots"
+      },
+      {
+        "id": "set2",
+        "label": "Monsters"
+      },
+      {
+        "id": "set3",
+        "label": "Robot heads"
+      },
+      {
+        "id": "set4",
+        "label": "Cats"
+      },
+      {
+        "id": "set5",
+        "label": "Humans"
+      }
     ]
   },
   "text": {
@@ -75,6 +169,47 @@
     "empty": "Nothing here yet. Type a prompt and press Generate image.",
     "loading": "Making your image...",
     "failed": "That image did not load. Try Generate image again or change the seed.",
-    "configError": "main.json could not be loaded. Open this folder with a local server, for example: python -m http.server 8000, then visit http://localhost:8000"
-  }
+    "configError": "main.json could not be loaded. Open this folder with a local server, for example: python -m http.server 8000, then visit http://localhost:8000",
+    "waiting": "Next AI image slot opens in {s} s",
+    "robohashNote": "Robohash turns your words into a unique character right away. Change the seed for a new one.",
+    "pollNote": "Pollinations makes real AI pictures but the free plan allows one image every 45 seconds. Extra clicks wait in line.",
+    "limit": "Pollinations says the free limit is reached. Wait a minute and try again, or use Robohash."
+  },
+  "rings": [
+    {
+      "count": 8,
+      "radius": 150,
+      "size": 86,
+      "speed": 36,
+      "dir": 1
+    },
+    {
+      "count": 14,
+      "radius": 290,
+      "size": 104,
+      "speed": 64,
+      "dir": -1
+    },
+    {
+      "count": 22,
+      "radius": 460,
+      "size": 120,
+      "speed": 100,
+      "dir": 1
+    },
+    {
+      "count": 30,
+      "radius": 660,
+      "size": 136,
+      "speed": 150,
+      "dir": -1
+    },
+    {
+      "count": 40,
+      "radius": 880,
+      "size": 150,
+      "speed": 210,
+      "dir": 1
+    }
+  ]
 }
