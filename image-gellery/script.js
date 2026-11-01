@@ -410,13 +410,25 @@ textarea{min-height:110px;resize:vertical}
   async function boot() {
     const app = $("#app");
     let cfg;
-    try {
-      const res = await fetch("main.json", { cache: "no-store" });
-      if (!res.ok) throw new Error(res.status);
-      cfg = await res.json();
-    } catch (e) {
-      document.body.style.cssText = "background:#000;color:#ffe21a;font-family:sans-serif;padding:40px";
-      app.textContent = "main.json could not be loaded. Open this folder with a local server, for example: python -m http.server 8000, then visit http://localhost:8000";
+    const base = document.currentScript ? document.currentScript.src : location.href;
+    const tries = [new URL("main.json", base).href, new URL("main.json", location.href).href, "/main.json"];
+    const seen = [];
+    for (const u of Array.from(new Set(tries))) {
+      try {
+        const res = await fetch(u + "?v=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) { seen.push(u + " -> HTTP " + res.status); continue; }
+        cfg = await res.json();
+        break;
+      } catch (e) {
+        seen.push(u + " -> " + e.message);
+      }
+    }
+    if (!cfg) {
+      document.body.style.cssText = "background:#000;color:#ffe21a;font-family:sans-serif;padding:40px;line-height:1.6";
+      app.textContent = "";
+      app.append(el("h2", { text: "main.json could not be loaded" }));
+      seen.forEach((m) => app.append(el("p", { text: m })));
+      app.append(el("p", { text: "Check that main.json is in the same folder as index.html and was deployed with it." }));
       return;
     }
 
