@@ -1,0 +1,6 @@
+# All pages allowed except the gallery data file.
+# Paths only, so this works on every domain that serves this site.
+
+User-agent: *
+Allow: /
+Disallow: /image-gellery/main.json
