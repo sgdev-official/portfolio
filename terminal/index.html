@@ -12,11 +12,14 @@
             font-family: monospace;
             margin: 0;
             padding: 20px;
+            overflow: hidden; /* Stops scrollbars on the body */
+            height: 100vh;
+            box-sizing: border-box;
         }
         #term {
             width: 100%;
-            height: 100vh;
-            box-sizing: border-box;
+            height: 100%;
+            overflow: hidden; /* Prevents content inside the terminal from overflowing */
         }
     </style>
 </head>
