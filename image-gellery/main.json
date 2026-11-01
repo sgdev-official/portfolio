@@ -1,1 +1,80 @@
-
+{
+  "app": {
+    "name": "BEARING BEAR",
+    "tagline": "Gallery + AI image maker",
+    "pageSize": 24,
+    "backgroundTiles": 90
+  },
+  "palette": {
+    "yellow": "#ffe21a",
+    "red": "#d20101",
+    "blue": "#0e198b",
+    "black": "#000000"
+  },
+  "fonts": {
+    "display": "'Arial Black', Impact, 'Helvetica Neue', sans-serif",
+    "body": "'Trebuchet MS', 'Segoe UI', Verdana, sans-serif"
+  },
+  "sources": [
+    { "id": "unsplash", "label": "Unsplash", "weight": 4,
+      "queries": ["bear", "grizzly bear", "polar bear", "ball bearing", "steel bearings", "machinery gears", "teddy bear", "brown bear forest"] },
+    { "id": "robohash", "label": "Robohash", "weight": 3,
+      "sets": ["set1", "set2", "set3", "set4", "set5"], "bgsets": ["bg1", "bg2"] },
+    { "id": "pollinations", "label": "Pollinations", "weight": 3,
+      "prompts": [
+        "bear made of ball bearings, chrome, studio light",
+        "giant bear in yellow red blue pop art",
+        "steel ball bearing macro, shiny, black background",
+        "robot bear mechanic, comic style",
+        "polar bear on red mountain, flat poster",
+        "bear head built from gears and bearings, blueprint",
+        "yellow bear in a neon city, cinematic"
+      ] }
+  ],
+  "generator": {
+    "endpoint": "https://image.pollinations.ai/prompt/",
+    "models": ["flux", "turbo", "gptimage"],
+    "sizes": [
+      { "label": "Square 1024", "w": 1024, "h": 1024 },
+      { "label": "Portrait 768x1024", "w": 768, "h": 1024 },
+      { "label": "Landscape 1024x768", "w": 1024, "h": 768 },
+      { "label": "Wide 1280x720", "w": 1280, "h": 720 },
+      { "label": "Small 512", "w": 512, "h": 512 }
+    ],
+    "styles": [
+      { "label": "None", "suffix": "" },
+      { "label": "Pop art", "suffix": ", bold pop art, halftone dots, flat colours" },
+      { "label": "Photo", "suffix": ", ultra realistic photo, 85mm, soft light" },
+      { "label": "Blueprint", "suffix": ", technical blueprint drawing, white lines on blue" },
+      { "label": "Chrome 3D", "suffix": ", glossy chrome 3d render, studio lighting" },
+      { "label": "Comic", "suffix": ", comic book ink, thick outlines, red yellow blue" },
+      { "label": "Sticker", "suffix": ", die-cut sticker, white border, vector" }
+    ],
+    "randomPrompts": [
+      "a bear balancing on a giant ball bearing",
+      "a mechanical bear heart made of brass bearings",
+      "a yellow robot bear drinking tea",
+      "a red bear king on a blue throne",
+      "a bearing factory run by tiny bears",
+      "a bear astronaut floating over a black planet",
+      "a bear lighthouse in a storm of yellow lightning"
+    ]
+  },
+  "text": {
+    "galleryTab": "Gallery",
+    "makerTab": "Image maker",
+    "all": "All",
+    "more": "Load more",
+    "promptPlaceholder": "Describe the image you want",
+    "generate": "Generate image",
+    "random": "Random idea",
+    "download": "Download",
+    "open": "Open original",
+    "save": "Save",
+    "saved": "Saved",
+    "empty": "Nothing here yet. Type a prompt and press Generate image.",
+    "loading": "Making your image...",
+    "failed": "That image did not load. Try Generate image again or change the seed.",
+    "configError": "main.json could not be loaded. Open this folder with a local server, for example: python -m http.server 8000, then visit http://localhost:8000"
+  }
+}
