@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="http://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Logo" width="180" />
+  <img src="http://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Logo"  />
 </div>
 
 # 🚀 SGDEV Developer Portfolio & Technical Research Blog
