@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Banner" />
+  <img src="http://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Banner" />
 </div>
 
 <br>
