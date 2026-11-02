@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://sgdev.is-cool.dev/assets/sg.cool.png" alt="SGDEV Logo" width="140" />
+</div>
+
 # 🚀 SGDEV Developer Portfolio & Technical Research Blog
 
 Welcome to the official source repository for **SGDEV Labs** (`sgdev.qd.je / sgdev.is-cool.dev`). This platform hosts my primary personal software engineering portfolio along with an integrated open-source technical research blog.
@@ -13,7 +17,7 @@ This repository is designed with a lightweight, telemetry-free, and high-perform
 1. **Developer Portfolio (`/index.html`)**
    * Showcases full-stack web applications, Python automation utilities, Pygame/PyQt software, and custom network tools.
    * Minimalist dark-mode aesthetics optimized for speed, clarity, and cross-device responsiveness.
-   * direct developer contact routing via custom DNS configurations (`info@sgdev.qd.je`).
+   * Direct developer contact routing via custom DNS configurations (`info@sgdev.qd.je`).
 
 2. **Technical Research Blog (`/blog/`)**
    * **Windows & Security:** In-depth technical analysis of Microsoft Activation Scripts (MAS), Hardware Hashes (HWID), and licensing internals.
@@ -35,4 +39,4 @@ This repository is designed with a lightweight, telemetry-free, and high-perform
 
 ## 📜 Repository Licensing & Legal Terms
 
-This project operates under a **dual-licensing structure** to preserve open-source integrity while maintaining flexibility for technical publications:
+This project operates under a **dual-licensing structure** to preserve open-source integrity while maintaining flexibility for technical publications.
