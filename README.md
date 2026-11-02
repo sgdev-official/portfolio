@@ -1,44 +1,90 @@
-
 <div align="center">
-  <img src="http://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Logo"  />
+  <img src="http://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Banner" />
 </div>
 
-<img width="140" alt="sg cool" src="https://github.com/user-attachments/assets/8a563888-53ca-4dc9-bac2-dfd1dfa62f1b" />
-# 🚀 SGDEV Developer Portfolio & Technical Research Blog
+<br>
 
-Welcome to the official source repository for **SGDEV Labs** (`sgdev.qd.je / sgdev.is-cool.dev`). This platform hosts my primary personal software engineering portfolio along with an integrated open-source technical research blog.
+<table align="center">
+  <tr>
+    <td width="170" align="center" valign="middle">
+      <img width="140" alt="sg cool" src="https://github.com/user-attachments/assets/8a563888-53ca-4dc9-bac2-dfd1dfa62f1b" />
+    </td>
+    <td valign="middle">
+      <h1>🚀 SGDEV Developer Portfolio<br>&amp; Technical Research Blog</h1>
+      <p>
+        Official source repository for <b>SGDEV Labs</b> — my software engineering portfolio
+        plus an integrated open-source research blog. <br>
+        <i>Lightweight • Telemetry-free • Blazing fast</i>
+      </p>
+      <p>
+        <a href="https://sgdev.is-cool.dev"><img src="https://img.shields.io/badge/🌐_Live_Site-sgdev.is--cool.dev-00c2ff?style=for-the-badge" /></a>
+        <a href="mailto:info@sgdev.qd.je"><img src="https://img.shields.io/badge/✉️_Contact-info@sgdev.qd.je-ff4d6d?style=for-the-badge" /></a>
+      </p>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" />
+  <img src="https://img.shields.io/badge/Netlify-00C7B7?style=flat-square&logo=netlify&logoColor=white" />
+  <img src="https://img.shields.io/badge/VSCodium-2F80ED?style=flat-square&logo=vscodium&logoColor=white" />
+  <img src="https://img.shields.io/badge/Telemetry-0%25-brightgreen?style=flat-square" />
+</p>
+
+<p align="center">
+  <a href="#-project-overview">Overview</a> •
+  <a href="#-key-modules">Modules</a> •
+  <a href="#️-tech-stack--infrastructure">Tech Stack</a> •
+  <a href="#-licensing--legal-terms">Licensing</a>
+</p>
 
 ---
 
 ## 📌 Project Overview
 
-This repository is designed with a lightweight, telemetry-free, and high-performance philosophy. It brings together my web development projects, utility software, system internals research, and cellular network telemetry studies into a single unified interface.
+A single unified interface bringing together my web projects, utility software, system internals research, and cellular network telemetry studies, built with a **lightweight, telemetry-free, high-performance** philosophy.
 
-### 🌟 Key Modules
+---
 
-1. **Developer Portfolio (`/index.html`)**
-   * Showcases full-stack web applications, Python automation utilities, Pygame/PyQt software, and custom network tools.
-   * Minimalist dark-mode aesthetics optimized for speed, clarity, and cross-device responsiveness.
-   * Direct developer contact routing via custom DNS configurations (`info@sgdev.qd.je`).
+## 🌟 Key Modules
 
-2. **Technical Research Blog (`/blog/`)**
-   * **Windows & Security:** In-depth technical analysis of Microsoft Activation Scripts (MAS), Hardware Hashes (HWID), and licensing internals.
-   * **Productivity Architecture:** Enterprise Click-to-Run (C2R) deployments, Office Deployment Tool (ODT) setups, and offline licensing mechanics.
-   * **Software Audits:** Evaluating telemetry-free open-source alternatives to commercial software (GIMP, Krita, PhotoDemon, Photopea).
-   * **Gaming & JVM Tuning:** Systems optimization for Java Edition Minecraft via SKLauncher, custom G1GC flags, and low-end hardware allocation.
-   * **Network Telemetry Case Studies:** Independent RF engineering analyses, including Airtel 5G NSA signaling and LTE 1800 MHz (Band 3) anchor channel metrics.
+### 💼 Developer Portfolio &nbsp;`/index.html`
+- Full-stack web apps, Python automation utilities, Pygame/PyQt software, and custom network tools
+- Minimalist dark-mode design, optimized for speed, clarity, and every screen size
+- Direct contact routing via custom DNS (`info@sgdev.qd.je`)
+
+### 📝 Technical Research Blog &nbsp;`/blog/`
+
+| Category | What's inside |
+|---|---|
+| 🔐 **Windows & Security** | Microsoft Activation Scripts (MAS), Hardware Hashes (HWID), licensing internals |
+| 🏢 **Productivity Architecture** | Click-to-Run (C2R) deployments, Office Deployment Tool (ODT), offline licensing |
+| 🧪 **Software Audits** | Telemetry-free alternatives: GIMP, Krita, PhotoDemon, Photopea |
+| 🎮 **Gaming & JVM Tuning** | Minecraft Java via SKLauncher, custom G1GC flags, low-end hardware allocation |
+| 📡 **Network Telemetry** | Airtel 5G NSA signaling, LTE 1800 MHz (Band 3) anchor channel metrics |
 
 ---
 
 ## 🛠️ Tech Stack & Infrastructure
 
-* **Frontend:** Pure HTML5, Modern CSS3 (CSS Variables, CSS Grid, Flexbox) — Zero heavy frameworks for lightning-fast loads.
-* **Editor Environment:** VSCodium / Notepad++ (100% telemetry-free development workflow).
-* **DNS & Routing:** Hurricane Electric DNS (`dns.he.net`), Vercel Edge Network, and Netlify hosting infrastructure.
-* **Mail Routing:** Hybrid mail architecture utilizing Gmail IMAP, `smtppro.zoho.in` SMTP, and ImprovMX alias forwarding.
+| Layer | Tools |
+|---|---|
+| 🎨 **Frontend** | Pure HTML5, modern CSS3 (Variables, Grid, Flexbox), zero heavy frameworks |
+| ⌨️ **Editor** | VSCodium / Notepad++ (100% telemetry-free workflow) |
+| 🌍 **DNS & Hosting** | Hurricane Electric DNS (`dns.he.net`), Vercel Edge Network, Netlify |
+| 📬 **Mail Routing** | Gmail IMAP, `smtppro.zoho.in` SMTP, ImprovMX alias forwarding |
 
 ---
 
-## 📜 Repository Licensing & Legal Terms
+## 📜 Licensing & Legal Terms
 
-This project operates under a **dual-licensing structure** to preserve open-source integrity while maintaining flexibility for technical publications.
+This project uses a **dual-licensing structure** to preserve open-source integrity while keeping flexibility for technical publications.
+
+---
+
+<p align="center">
+  Made with ❤️ by <b>SGDEV</b> • <a href="https://sgdev.is-cool.dev">sgdev.is-cool.dev</a>
+</p>
