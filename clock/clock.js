@@ -1,4 +1,6 @@
-/* Chrono Complication v2 - plain ES5 so older phones and browsers can run it. */
+/* Chrono Complication v3 - plain ES5 so older phones and browsers can run it.
+   The design is laid out at a fixed size and then scaled to fit the screen,
+   so nothing scrolls and nothing can be cut off. Zoom gestures are blocked. */
 (function () {
 'use strict';
 var Y = '#ffe21a', K = '#000000', TAU = Math.PI * 2;
@@ -47,32 +49,41 @@ function TH() { return THEMES[S.theme] || THEMES.tri; }
 
 // ===== styling, all written in JS (no CSS variables, no grid: works on old browsers) =====
 var RULES = [
-  ['html,body', 'margin:0;padding:0;min-height:100%'],
+  ['html,body', 'margin:0;padding:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:pan-x pan-y;' +
+    '-webkit-touch-callout:none;-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent'],
   ['*', '-webkit-box-sizing:border-box;box-sizing:border-box'],
-  ['body', 'background:@B;color:@F;font:15px/1.45 "Trebuchet MS",Arial,sans-serif;-webkit-text-size-adjust:100%;' +
+  ['body', 'background:@B;color:@F;font:15px/1.45 "Trebuchet MS",Arial,sans-serif;-webkit-text-size-adjust:100%;text-size-adjust:100%'],
+  ['.stage', 'position:fixed;left:0;top:0;overflow:hidden;' +
     'padding-top:constant(safe-area-inset-top);padding-top:env(safe-area-inset-top);' +
-    'padding-bottom:constant(safe-area-inset-bottom);padding-bottom:env(safe-area-inset-bottom)'],
-  ['.app', 'max-width:1180px;margin:0 auto;padding:16px;overflow:hidden'],
-  ['.left,.right', 'display:inline-block;vertical-align:top;width:49%;padding:0 1%'],
+    'padding-bottom:constant(safe-area-inset-bottom);padding-bottom:env(safe-area-inset-bottom);' +
+    'padding-left:constant(safe-area-inset-left);padding-left:env(safe-area-inset-left);' +
+    'padding-right:constant(safe-area-inset-right);padding-right:env(safe-area-inset-right)'],
+  ['.app', 'position:absolute;left:0;top:0;padding:16px;overflow:hidden;-webkit-transform-origin:0 0;transform-origin:0 0'],
+  ['.left,.right', 'vertical-align:top'],
   ['.left', 'text-align:center'],
-  ['@media (max-width:820px)', '.left,.right{display:block;width:100%;padding:0}.right{margin-top:20px}'],
+  ['.app.wide .left,.app.wide .right', 'display:inline-block;width:49%;padding:0 1%'],
+  ['.app.tall .left,.app.tall .right', 'display:block;width:100%;padding:0'],
+  ['.app.tall .right', 'margin-top:20px'],
   ['canvas', 'display:block;margin:0 auto;max-width:100%'],
+  ['.top', 'position:relative'],
   ['.gears', 'margin-top:14px;cursor:pointer'],
   ['.big', 'font:bold 52px/1 "Courier New",monospace;letter-spacing:-2px;margin-top:14px'],
-  ['@media (min-width:480px)', '.big{font-size:68px}'],
+  ['.app.wide .big', 'font-size:68px'],
+  ['.app.tall .big', 'font-size:56px'],
   ['.big small', 'font-size:22px;letter-spacing:0;margin-left:6px'],
   ['.date', 'font-size:18px;margin-top:8px'],
   ['.meta', 'opacity:.8;font-size:13px;margin-top:4px'],
   ['.tabs', 'margin-bottom:10px'],
-  ['button', 'font:inherit;color:@F;background:transparent;border:2px solid @F;border-radius:999px;padding:6px 13px;margin:3px;cursor:pointer;-webkit-appearance:none'],
+  ['button', 'font:inherit;color:@F;background:transparent;border:2px solid @F;border-radius:999px;padding:6px 13px;margin:3px;cursor:pointer;-webkit-appearance:none;touch-action:manipulation'],
   ['button:hover,button.on', 'background:@F;color:@B'],
   ['.sw', 'width:30px;height:30px;padding:0;vertical-align:middle'],
   ['.sw.h', 'background:#ca0a0a'], ['.sw.c', 'background:#1423b6'], ['.sw.j', 'background:#ffe21a'],
   ['.sw.t', 'background:#1423b6;background:-webkit-linear-gradient(left,#ca0a0a 33%,#1423b6 33%,#1423b6 66%,#ffe21a 66%);' +
     'background:linear-gradient(90deg,#ca0a0a 33%,#1423b6 33%,#1423b6 66%,#ffe21a 66%)'],
   ['.sw.on', '-webkit-box-shadow:0 0 0 3px @B,0 0 0 5px @F;box-shadow:0 0 0 3px @B,0 0 0 5px @F'],
-  ['input', 'font:inherit;color:@F;background:@B;border:2px solid @F;border-radius:10px;padding:7px 10px;width:120px;margin:3px'],
-  ['.panel', 'border:2px solid @F;border-radius:22px;padding:16px;min-height:380px'],
+  ['input', 'font:inherit;font-size:16px;color:@F;background:@B;border:2px solid @F;border-radius:10px;padding:7px 10px;width:120px;margin:3px;' +
+    '-webkit-user-select:text;user-select:text'],
+  ['.panel', 'border:2px solid @F;border-radius:22px;padding:16px;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;-webkit-overflow-scrolling:touch'],
   ['.row', 'padding:9px 0;border-bottom:1px dotted @F;overflow:hidden'],
   ['.fl', 'float:left'], ['.fr', 'float:right'],
   ['.mono', 'font-family:"Courier New",monospace'],
@@ -82,7 +93,9 @@ var RULES = [
   ['.bar i', 'display:block;height:100%;background:@F'],
   ['.bc', 'display:inline-block;width:15%;text-align:center;vertical-align:bottom'],
   ['.bd', 'display:block;width:26px;height:26px;border:2px solid @F;border-radius:50%;margin:7px auto'],
-  ['.mini', 'margin:14px auto 0;max-width:340px;border:2px solid @F;border-radius:18px;padding:10px'],
+  // the calendar opens over the clock so the layout never changes size
+  ['.mini', 'display:none;position:absolute;left:0;right:0;top:0;bottom:0;margin:0 auto;max-width:340px;background:@B;' +
+    'border:2px solid @F;border-radius:18px;padding:10px;overflow:hidden;z-index:5'],
   ['.hd', 'overflow:hidden;line-height:34px;font-weight:bold;text-align:center'],
   ['.hd button', 'padding:1px 12px;margin:0'],
   ['.cell', 'display:inline-block;width:14.28%;text-align:center;padding:6px 0;border-radius:8px;font-size:14px;cursor:pointer;border:2px solid transparent'],
@@ -108,6 +121,7 @@ function applyTheme() {
   var t = buildCSS(), th = TH();
   if (styleEl.styleSheet) styleEl.styleSheet.cssText = t; else styleEl.textContent = t;
   document.body.style.background = th.bg; document.body.style.color = th.fg;
+  document.documentElement.style.background = th.bg;
 }
 
 // ===== sound =====
@@ -147,7 +161,7 @@ function dateStr(d) { return DAYS[d.getDay()].slice(0, 3) + ' ' + d.getDate() + 
 // ===== layout =====
 var test = document.createElement('canvas');
 if (!(test.getContext && test.getContext('2d'))) throw new Error('canvas is not supported');
-var calOpen = false;
+var calOpen = false, dirty = true;
 var cv = h('canvas', { 'aria-label': 'Analog clock with gears, moon phase and sub-dials' });
 var gv = h('canvas', { className: 'gears', 'aria-label': 'Rotating gears for HTML, CSS and JS' });
 var bigEl = h('div', { className: 'big mono', title: 'Tap to show or hide the calendar', style: { cursor: 'pointer' }, onclick: function () { setCal(!calOpen); } });
@@ -162,10 +176,10 @@ var tabsEl = h('div', { className: 'tabs' });
 var panel = h('div', { className: 'panel' });
 var SW = [['h', 'html', 'HTML'], ['c', 'css', 'CSS'], ['j', 'js', 'JS'], ['t', 'tri', 'Tri-colour']];
 function setCal(v) {
-  calOpen = v; miniEl.style.display = v ? 'block' : 'none'; miniInfo.style.display = v ? 'block' : 'none'; drawTop();
+  calOpen = v; miniEl.style.display = v ? 'block' : 'none'; drawTop();
 }
-function setTheme(n) { S.theme = n; save(); applyTheme(); drawTop(); if (S.tab === 'settings') renderTab(); }
-function applyGearVis() { var v = S.gears ? 'block' : 'none'; gv.style.display = v; gearNote.style.display = v; }
+function setTheme(n) { S.theme = n; save(); applyTheme(); drawTop(); dirty = true; if (S.tab === 'settings') renderTab(); }
+function applyGearVis() { resize(); }
 function drawTop() {
   clear(topRow);
   topRow.appendChild(h('button', { className: calOpen ? 'on' : '', onclick: function () { setCal(!calOpen); } }, 'Calendar'));
@@ -175,25 +189,89 @@ function drawTop() {
   })(SW[i]);
 }
 applyTheme();
+var textBox = h('div', {}, bigEl, dateEl, metaEl);
+var topBox = h('div', { className: 'top' }, cv, textBox, miniEl);
+var leftEl = h('div', { className: 'left' }, topBox, topRow);
+var rightEl = h('div', { className: 'right' }, tabsEl, panel, gv, gearNote);
+var appEl = h('div', { className: 'app wide' }, leftEl, rightEl);
+var stage = h('div', { className: 'stage' }, appEl);
 document.body.appendChild(ring);
-document.body.appendChild(h('div', { className: 'app' },
-  h('div', { className: 'left' }, cv, h('div', {}, bigEl, dateEl, metaEl), topRow, miniEl, miniInfo),
-  h('div', { className: 'right' }, tabsEl, panel, gv, gearNote)));
+document.body.appendChild(stage);
 var ctx = cv.getContext('2d'), gctx = gv.getContext('2d'), Z = 320, GW = 320, GH = 200, dpr = 1;
-function resize() {
-  dpr = window.devicePixelRatio || 1;
-  var w = cv.parentNode.clientWidth || 320;
-  Z = Math.max(240, Math.min(560, w));
-  GW = Math.max(240, Math.min(560, gv.parentNode.clientWidth || w)); GH = Math.floor(GW * 0.62);
-  cv.width = Math.floor(Z * dpr); cv.height = Math.floor(Z * dpr);
+
+// The design is built at a fixed width in one of two arrangements (side by side or stacked).
+// Both are measured, the one that can be shown larger wins, and it is scaled to fit the screen.
+var MODES = {
+  wide: { w: 1040, ph: 420, gcap: 400 },
+  tall: { w: 400, ph: 340, gcap: 300 }
+};
+function colWidth(m) { var aw = MODES[m].w - 32; return m === 'wide' ? aw * 0.47 : aw; }
+function layout(m) {
+  var M = MODES[m], cw = Math.floor(colWidth(m));
+  appEl.className = 'app ' + m; appEl.style.width = M.w + 'px';
+  Z = Math.max(120, Math.min(560, cw));
   cv.style.width = Z + 'px'; cv.style.height = Z + 'px';
-  gv.width = Math.floor(GW * dpr); gv.height = Math.floor(GH * dpr);
+  GW = Math.max(120, Math.min(cw, M.gcap)); GH = Math.floor(GW * 0.62);
   gv.style.width = GW + 'px'; gv.style.height = GH + 'px';
+  var gd = S.gears ? 'block' : 'none';
+  gv.style.display = gd; gearNote.style.display = gd;
+  panel.style.height = M.ph + 'px';
+  return appEl.offsetHeight;
+}
+function px(v) { return parseFloat(v) || 0; }
+function resize() {
+  var W = window.innerWidth || document.documentElement.clientWidth || 360;
+  var H = window.innerHeight || document.documentElement.clientHeight || 600;
+  stage.style.width = W + 'px'; stage.style.height = H + 'px';
+  var cs = window.getComputedStyle ? window.getComputedStyle(stage, null) : null;
+  var pl = cs ? px(cs.paddingLeft) : 0, pr = cs ? px(cs.paddingRight) : 0;
+  var pt = cs ? px(cs.paddingTop) : 0, pb = cs ? px(cs.paddingBottom) : 0;
+  var aw = Math.max(100, W - pl - pr), ah = Math.max(100, H - pt - pb);
+  var names = ['wide', 'tall'], best = null, i, hh, s;
+  for (i = 0; i < names.length; i++) {
+    hh = layout(names[i]);
+    s = Math.min(aw / MODES[names[i]].w, ah / hh);
+    if (!best || s > best.s) best = { m: names[i], s: s, h: hh };
+  }
+  layout(best.m);
+  s = Math.min(best.s, 3);
+  var tx = pl + (aw - MODES[best.m].w * s) / 2, ty = pt + (ah - best.h * s) / 2;
+  var tf = 'translate(' + tx + 'px,' + ty + 'px) scale(' + s + ')';
+  appEl.style.webkitTransform = tf; appEl.style.transform = tf;
+  // draw at the real screen resolution so the scaled canvases stay sharp
+  dpr = Math.max(0.5, Math.min(3, (window.devicePixelRatio || 1) * s));
+  cv.width = Math.floor(Z * dpr); cv.height = Math.floor(Z * dpr);
+  gv.width = Math.floor(GW * dpr); gv.height = Math.floor(GH * dpr);
+  dirty = true;
 }
 on(window, 'resize', resize);
+on(window, 'orientationchange', function () { setTimeout(resize, 200); });
 var gAng = 0, gLast = 0, gBoost = 1;
 on(gv, 'click', function () { gBoost = 12; });
-drawTop(); setCal(false); applyGearVis();
+drawTop(); setCal(false);
+
+// ===== block zoom and page scrolling =====
+function stop(e) { if (e && e.preventDefault) e.preventDefault(); return false; }
+on(document, 'gesturestart', stop); on(document, 'gesturechange', stop); on(document, 'gestureend', stop);
+if (document.addEventListener) {
+  try {
+    document.addEventListener('touchmove', function (e) {
+      if (e.touches && e.touches.length > 1) e.preventDefault();
+      else {
+        // single finger: only the panel is allowed to scroll
+        var n = e.target, ok = false;
+        while (n && n !== document.body) { if (n === panel) { ok = true; break; } n = n.parentNode; }
+        if (!ok) e.preventDefault();
+      }
+    }, { passive: false });
+    document.addEventListener('wheel', function (e) { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+  } catch (err) {}
+}
+on(document, 'keydown', function (e) {
+  e = e || window.event;
+  var c = e.keyCode || e.which;
+  if ((e.ctrlKey || e.metaKey) && (c === 107 || c === 109 || c === 187 || c === 189 || c === 61 || c === 173 || c === 48 || c === 96)) stop(e);
+});
 
 // ===== analog drawing =====
 function pt(cx, cy, r, a) { return [cx + Math.cos(a - Math.PI / 2) * r, cy + Math.sin(a - Math.PI / 2) * r]; }
@@ -373,7 +451,7 @@ function updateDigital(d) {
   document.title = f[0] + ':' + f[1] + (f[3] ? ' ' + f[3] : '') + ' Chrono';
 }
 
-// ===== mini calendar (under the digital time) =====
+// ===== mini calendar (opens over the clock) =====
 var mini = { y: 0, m: 0, sel: null };
 function stepMonth(n) {
   mini.m += n;
@@ -405,6 +483,7 @@ function drawMini() {
     miniEl.appendChild(h('span', { className: cls, onclick: function () { mini.sel = [mini.y, mini.m, day]; drawMini(); } }, String(day)));
   })(i);
   miniEl.appendChild(h('div', { className: 'btns', style: { marginBottom: 0 } }, h('button', { onclick: showToday }, 'Today')));
+  miniEl.appendChild(miniInfo);
   miniText();
 }
 
@@ -482,7 +561,7 @@ views.stopwatch = (function () {
     build: function (root) {
       disp = h('div', { className: 'huge' }, fmt(elapsed()));
       startBtn = h('button', { onclick: toggle }, W.run ? 'Pause' : 'Start');
-      list = h('div', { style: { maxHeight: '240px', overflow: 'auto' } });
+      list = h('div');
       root.appendChild(disp);
       root.appendChild(h('div', { className: 'btns' }, startBtn, h('button', { onclick: lap }, 'Lap'), h('button', { onclick: reset }, 'Reset')));
       root.appendChild(list); drawLaps();
@@ -729,7 +808,7 @@ views.settings = {
     for (i = 0; i < opts.length; i++) (function (k, t) {
       var b = h('button', { className: 'fr' });
       function paint() { b.textContent = S[k] ? 'On' : 'Off'; b.className = 'fr' + (S[k] ? ' on' : ''); }
-      b.onclick = function () { S[k] = !S[k]; save(); if (k === 'gears') applyGearVis(); paint(); };
+      b.onclick = function () { S[k] = !S[k]; save(); if (k === 'gears') applyGearVis(); dirty = true; paint(); };
       paint(); root.appendChild(h('div', { className: 'row' }, b, t));
     })(opts[i][0], opts[i][1]);
     root.appendChild(h('div', { className: 'row' }, h('button', { className: 'fr', onclick: toggleFS }, 'Toggle'), 'Fullscreen'));
@@ -753,7 +832,7 @@ function renderTabs() {
 }
 function renderTab() {
   if (!views[S.tab]) S.tab = 'world';
-  renderTabs(); clear(panel); views[S.tab].build(panel); views[S.tab].tick(new Date());
+  renderTabs(); clear(panel); panel.scrollTop = 0; views[S.tab].build(panel); views[S.tab].tick(new Date());
 }
 
 // ===== keyboard =====
@@ -781,7 +860,7 @@ var lastSec = -1, lastText = 0, lastDay = -1, failed = false;
 function frame() {
   try {
     var d = new Date();
-    if (S.smooth || d.getSeconds() !== lastSec) drawClock(d);
+    if (S.smooth || dirty || d.getSeconds() !== lastSec) { drawClock(d); dirty = false; }
     if (S.gears) drawGears(tnow());
     if (d.getDate() !== lastDay) { lastDay = d.getDate(); if (!mini.sel) showToday(); else drawMini(); }
     if (d.getSeconds() !== lastSec) { lastSec = d.getSeconds(); checkAlarms(d); }
@@ -795,7 +874,7 @@ function frame() {
   raf(frame);
 }
 try {
-  resize(); showToday(); renderTab(); frame();
+  showToday(); renderTab(); updateDigital(new Date()); resize(); frame();
   if (!failed) { window.ChronoOK = true; if (window.ChronoBasic) window.ChronoBasic.hide(); }
 } catch (err) {
   if (window.ChronoBasic) window.ChronoBasic.show('Full clock could not start (' + (err && err.message) + '). Showing the basic clock.');
