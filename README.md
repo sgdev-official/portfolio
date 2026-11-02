@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://sgdev.qd.je/assets/sg.cool.png" alt="SGDEV Logo" width="140" />
+  <img src="https://sgdev.qd.je/assets/sg.cool.png" alt="SGDEV Logo" width="180" />
 </div>
 
 # 🚀 SGDEV Developer Portfolio & Technical Research Blog
