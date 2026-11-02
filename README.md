@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="http://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Banner" />
+  <img src="https://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Banner" />
 </div>
 
 <br>
@@ -30,6 +30,7 @@
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" />
   <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" />
   <img src="https://img.shields.io/badge/Netlify-00C7B7?style=flat-square&logo=netlify&logoColor=white" />
+  <img src="https://img.shields.io/badge/Surge-FF5A5F?style=flat-square&logo=surge&logoColor=white" />
   <img src="https://img.shields.io/badge/VSCodium-2F80ED?style=flat-square&logo=vscodium&logoColor=white" />
   <img src="https://img.shields.io/badge/Telemetry-0%25-brightgreen?style=flat-square" />
 </p>
@@ -74,7 +75,7 @@ A single unified interface bringing together my web projects, utility software, 
 |---|---|
 | 🎨 **Frontend** | Pure HTML5, modern CSS3 (Variables, Grid, Flexbox), zero heavy frameworks |
 | ⌨️ **Editor** | VSCodium / Notepad++ (100% telemetry-free workflow) |
-| 🌍 **DNS & Hosting** | Hurricane Electric DNS (`dns.he.net`), Vercel Edge Network, Netlify |
+| 🌍 **DNS & Hosting** | Hurricane Electric DNS (`dns.he.net`), Vercel Edge Network, Netlify, Surge |
 | 📬 **Mail Routing** | Gmail IMAP, `smtppro.zoho.in` SMTP, ImprovMX alias forwarding |
 
 ---
