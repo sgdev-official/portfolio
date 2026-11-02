@@ -7,7 +7,7 @@
 <table align="center">
   <tr>
     <td width="170" align="center" valign="middle">
-      <img width="140" alt="sg cool" src="https://github.com/user-attachments/assets/8a563888-53ca-4dc9-bac2-dfd1dfa62f1b" />
+      <img width="140" alt="sg cool" src="http://sgdev.is-cool.dev/assets/sg.cool.png" />
     </td>
     <td valign="middle">
       <h1>🚀 SGDEV Developer Portfolio<br>&amp; Technical Research Blog</h1>
