@@ -1,7 +1,9 @@
+
 <div align="center">
   <img src="http://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Logo"  />
 </div>
 
+<img width="353" height="423" alt="sg cool" src="https://github.com/user-attachments/assets/8a563888-53ca-4dc9-bac2-dfd1dfa62f1b" />
 # 🚀 SGDEV Developer Portfolio & Technical Research Blog
 
 Welcome to the official source repository for **SGDEV Labs** (`sgdev.qd.je / sgdev.is-cool.dev`). This platform hosts my primary personal software engineering portfolio along with an integrated open-source technical research blog.
