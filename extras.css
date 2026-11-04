@@ -1,7 +1,7 @@
 /* extras.css: lazy-loaded together with fx.js / lab.js (never blocks first paint) */
 .cglow{position:fixed;left:-150px;top:-150px;width:300px;height:300px;border-radius:50%;pointer-events:none;z-index:1;opacity:0;transition:opacity .4s;background:radial-gradient(circle,rgba(var(--yr),.14),transparent 65%);will-change:transform}
 .fxc{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:80}
-.fxc.rain{pointer-events:auto;z-index:90;background:#000;cursor:pointer}
+.fxc.rain{pointer-events:auto;z-index:90;background:var(--bg);cursor:pointer}
 .pcv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:-1}
 
 /* spotlight, tilt, ripple */
@@ -14,8 +14,8 @@ html.js .rv.in.tilt{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY
 @keyframes rpl{to{transform:scale(1);opacity:0}}
 
 /* command palette */
-.pal{position:fixed;inset:0;z-index:100;display:grid;place-items:start center;padding:14vh 16px 0;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.pbox{width:min(560px,100%);background:#0e0e0e;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(var(--yr),.25)}
+.pal{position:fixed;inset:0;z-index:100;display:grid;place-items:start center;padding:14vh 16px 0;background:var(--shade-deep);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.pbox{width:min(560px,100%);background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-2)}
 .pbox input{width:100%;padding:18px 20px;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--text);font:500 17px var(--body);outline:0}
 .pbox ul{list-style:none;margin:0;padding:8px}
 .pbox li{padding:11px 14px;border-radius:10px;color:var(--muted);cursor:pointer}
@@ -28,17 +28,17 @@ html.js .rv.in.tilt{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY
 
 /* 2048 */
 .g48{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:min(100%,320px);touch-action:none}
-.t48{aspect-ratio:1;display:grid;place-items:center;border-radius:12px;background:#161616;font:800 clamp(16px,5vw,24px) var(--display)}
+.t48{aspect-ratio:1;display:grid;place-items:center;border-radius:12px;background:var(--surface);font:800 clamp(16px,5vw,24px) var(--display)}
 
 /* Simon */
 .simon{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(100%,300px)}
 .sb{aspect-ratio:1;border:0;border-radius:16px;background:var(--c);opacity:.35;cursor:pointer;transition:opacity .1s,box-shadow .1s}
 .sb.lit{opacity:1;box-shadow:0 0 24px var(--c)}
-.s0{--c:#cd0d0d}.s1{--c:#1b66d2}.s2{--c:#ffe21a}.s3{--c:#22c55e}
+.s0{--c:var(--html)}.s1{--c:var(--css)}.s2{--c:var(--y)}.s3{--c:var(--ok)}
 
 /* Minesweeper */
 .mines{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;width:min(100%,330px)}
-.ms{aspect-ratio:1;border:0;border-radius:8px;background:#1b1b1b;color:var(--text);font:700 15px var(--display);cursor:pointer;padding:0}
-.ms:hover{background:#262626}
-.ms.op{background:#0a0a0a;cursor:default}
-.ms.bad{background:#7f1d1d}
+.ms{aspect-ratio:1;border:0;border-radius:8px;background:var(--surface);color:var(--text);font:700 15px var(--display);cursor:pointer;padding:0}
+.ms:hover{background:var(--surface-2)}
+.ms.op{background:var(--field);cursor:default}
+.ms.bad{background:var(--wait-bg)}

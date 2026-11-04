@@ -44,6 +44,30 @@
     }
     c.addEventListener("input", up); B(r, "Copy", function () { S.copy(o.textContent); }); up();
   })();
+  (function () { /* Contrast (WCAG) */
+    var p = add(TL, "contrast", "Contrast"), r = el("div", "outrow", p), fg = el("input", "", r), bg = el("input", "", r), o = el("output", "mono pre", p);
+    [fg, bg].forEach(function (c) { c.type = "color"; c.style.cssText = "width:64px;height:48px;border:0;background:none;cursor:pointer"; });
+    fg.value = "#f5f5f0"; bg.value = "#0d0d0d";
+    function lum(h) {
+      var v = [1, 3, 5].map(function (i) { var c = parseInt(h.substr(i, 2), 16) / 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); });
+      return .2126 * v[0] + .7152 * v[1] + .0722 * v[2];
+    }
+    function up() {
+      var a = lum(fg.value), b = lum(bg.value), q = (Math.max(a, b) + .05) / (Math.min(a, b) + .05);
+      o.textContent = q.toFixed(2) + ":1\nBody text: " + (q >= 4.5 ? "passes AA" : "below AA") + "\nLarge text: " + (q >= 3 ? "passes AA" : "below AA") + "\nAAA: " + (q >= 7 ? "passes" : "needs 7:1");
+      o.style.color = q >= 4.5 ? "" : "var(--bad)";
+    }
+    fg.addEventListener("input", up); bg.addEventListener("input", up); up();
+  })();
+  (function () { /* Word count */
+    var p = add(TL, "count", "Count"), i = el("textarea", "", p), o = el("output", "mono pre", p);
+    i.rows = 5; i.placeholder = "Paste text to count words, characters and reading time.";
+    function up() {
+      var w = i.value.trim() ? i.value.trim().split(/\s+/).length : 0;
+      o.textContent = w + " words\n" + i.value.length + " characters\n" + Math.max(1, Math.round(w / 220)) + " min read";
+    }
+    i.addEventListener("input", up); up();
+  })();
 
   /* ---------- Games ---------- */
   (function () { /* 2048 */
