@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head><script>if(location.protocol==="http:")location.replace("https:"+location.href.slice(5));</script>
+<meta charset="utf-8">
+<title>Pixel Studio, SGDEV</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="A small Photoshop-style image editor that runs in the browser. Layers, brush, shapes, text, crop and adjustments.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">P</span>
+    <span class="brand-text">Pixel Studio</span>
+  </div>
+
+  <div class="actions">
+    <button id="newBtn" class="btn">New</button>
+    <button id="openBtn" class="btn">Open</button>
+    <details class="menu">
+      <summary class="btn">Export</summary>
+      <div class="menu-pop">
+        <button type="button" data-export="image/png">PNG <small>transparent</small></button>
+        <button type="button" data-export="image/jpeg">JPG <small>smaller</small></button>
+        <button type="button" data-export="image/webp">WebP <small>modern</small></button>
+      </div>
+    </details>
+    <span class="sep" aria-hidden="true"></span>
+    <button id="undoBtn" class="icon" aria-label="Undo" title="Undo (Ctrl+Z)" disabled>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-3"/></svg>
+    </button>
+    <button id="redoBtn" class="icon" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M20 9h-9a7 7 0 0 0 0 14h3"/></svg>
+    </button>
+    <span class="sep" aria-hidden="true"></span>
+    <button id="fitBtn" class="icon" aria-label="Fit to screen" title="Fit (0)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="tools" aria-label="Tools">
+    <button class="tool" data-tool="move" aria-label="Move layer" title="Move (V)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>
+    </button>
+    <button class="tool" data-tool="brush" aria-label="Brush" title="Brush (B)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4 9-9 3 3-9 9-4 1z"/><path d="M13 6l3 3"/></svg>
+    </button>
+    <button class="tool" data-tool="eraser" aria-label="Eraser" title="Eraser (E)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16l8-8 4 4-8 8H4z"/><path d="M4 20h16"/></svg>
+    </button>
+    <button class="tool" data-tool="line" aria-label="Line" title="Line (L)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20L20 4"/></svg>
+    </button>
+    <button class="tool" data-tool="rect" aria-label="Rectangle" title="Rectangle (R)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="1"/></svg>
+    </button>
+    <button class="tool" data-tool="ellipse" aria-label="Ellipse" title="Ellipse (O)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>
+    </button>
+    <button class="tool" data-tool="text" aria-label="Text" title="Text (T)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h12M12 5v14M9 19h6"/></svg>
+    </button>
+    <button class="tool" data-tool="fill" aria-label="Fill" title="Fill (G)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>
+    </button>
+    <button class="tool" data-tool="picker" aria-label="Eyedropper" title="Eyedropper (I)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3l2 2-9 9-3 1 1-3 9-9z"/><path d="M4 20l2-2"/></svg>
+    </button>
+    <button class="tool" data-tool="crop" aria-label="Crop" title="Crop (C)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v14h14M3 7h14v14"/></svg>
+    </button>
+
+    <div class="tool-sep" aria-hidden="true"></div>
+
+    <div class="colors">
+      <div class="swatch-stack">
+        <label class="swatch swatch-fg" title="Foreground colour">
+          <input type="color" id="fg" value="#ffe21a" aria-label="Foreground colour">
+        </label>
+        <label class="swatch swatch-bg" title="Background colour">
+          <input type="color" id="bg" value="#ffffff" aria-label="Background colour">
+        </label>
+      </div>
+      <button id="swapColors" class="icon small" aria-label="Swap colours" title="Swap colours (X)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11a4 4 0 0 1 0 8h-2"/><path d="M7 4L4 7l3 3"/><path d="M20 17h-3"/></svg>
+      </button>
+    </div>
+
+    <label class="slider" title="Brush size">
+      <span>Size <output id="sizeVal">24</output></span>
+      <input type="range" id="size" min="1" max="120" value="24">
+    </label>
+    <label class="slider" title="Tool opacity">
+      <span>Opacity <output id="opacityVal">100%</output></span>
+      <input type="range" id="opacity" min="1" max="100" value="100">
+    </label>
+  </aside>
+
+  <main class="stage-wrap">
+  <div class="stage" id="stage" tabindex="-1">
+    <div class="canvas-wrap" id="canvasWrap" hidden>
+      <canvas id="board" tabindex="0" aria-label="Drawing canvas"></canvas>
+      <canvas id="overlay" aria-hidden="true"></canvas>
+      <textarea id="textInput" class="text-input" rows="1" spellcheck="false" aria-label="Text to place" hidden></textarea>
+    </div>
+    <div class="empty" id="empty">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="8.5" r="1.5"/></svg>
+      <h1>Nothing open</h1>
+      <p>Drop an image, paste one, or start a blank canvas.</p>
+      <div class="empty-actions">
+        <button id="emptyNew" class="btn primary">New canvas</button>
+        <button id="emptyOpen" class="btn">Open image</button>
+      </div>
+      <p class="hint">Tip: Ctrl + wheel zooms, Space + drag pans.</p>
+    </div>
+  </div>
+
+  <div class="zoom-pill">
+    <button id="zoomOut" class="icon" aria-label="Zoom out" title="Zoom out (-)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+    </button>
+    <output id="zoomLabel" aria-live="off">100%</output>
+    <button id="zoomIn" class="icon" aria-label="Zoom in" title="Zoom in (+)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>
+    </button>
+  </div>
+  </main>
+
+  <aside class="panels">
+    <section class="panel">
+      <h2>Layers <span class="count" id="layerCount">0</span></h2>
+      <div class="layer-actions">
+        <button id="addLayer" class="mini">Add</button>
+        <button id="dupLayer" class="mini">Duplicate</button>
+        <button id="upLayer" class="mini" aria-label="Move layer up" title="Move up">&uarr;</button>
+        <button id="downLayer" class="mini" aria-label="Move layer down" title="Move down">&darr;</button>
+        <button id="delLayer" class="mini danger" aria-label="Delete layer" title="Delete layer">&times;</button>
+      </div>
+      <ul id="layers" class="layer-list" aria-label="Layers"></ul>
+      <label class="field">Opacity
+        <input type="range" id="layerOpacity" min="0" max="100" value="100">
+        <output id="layerOpacityVal">100%</output>
+      </label>
+      <label class="field">Blend
+        <select id="blend">
+          <option value="source-over">Normal</option>
+          <option value="multiply">Multiply</option>
+          <option value="screen">Screen</option>
+          <option value="overlay">Overlay</option>
+          <option value="darken">Darken</option>
+          <option value="lighten">Lighten</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="panel">
+      <h2>Adjust</h2>
+      <label class="field">Brightness
+        <input type="range" id="bright" min="0" max="200" value="100">
+        <output id="brightVal">100</output>
+      </label>
+      <label class="field">Contrast
+        <input type="range" id="contrast" min="0" max="200" value="100">
+        <output id="contrastVal">100</output>
+      </label>
+      <label class="field">Saturation
+        <input type="range" id="sat" min="0" max="200" value="100">
+        <output id="satVal">100</output>
+      </label>
+      <div class="row">
+        <button id="applyAdjust" class="mini primary">Apply</button>
+        <button id="resetAdjust" class="mini">Reset</button>
+      </div>
+      <div class="row wrap">
+        <button class="mini" data-filter="grayscale(1)">Grayscale</button>
+        <button class="mini" data-filter="invert(1)">Invert</button>
+        <button class="mini" data-filter="sepia(.8)">Sepia</button>
+        <button class="mini" data-filter="blur(3px)">Blur</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Document</h2>
+      <p id="docInfo" class="doc-stats">No document</p>
+      <div class="row">
+        <button id="flatten" class="mini">Flatten layers</button>
+        <button id="clearLayer" class="mini danger">Clear layer</button>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<footer class="status">
+  <span id="statusText">Open an image or start a new canvas.</span>
+  <span id="cursorPos" class="muted"></span>
+</footer>
+
+<dialog id="newDialog" class="dialog">
+  <form method="dialog" id="newForm">
+    <h2>New canvas</h2>
+    <div class="dialog-grid">
+      <label>Width <input id="newW" type="number" min="1" max="4096" value="1600"></label>
+      <label>Height <input id="newH" type="number" min="1" max="4096" value="1000"></label>
+    </div>
+    <label>Background
+      <select id="newBg">
+        <option value="#ffffff">White</option>
+        <option value="">Transparent</option>
+        <option value="#000000">Black</option>
+      </select>
+    </label>
+    <div class="dialog-actions">
+      <button value="cancel" class="mini">Cancel</button>
+      <button id="createDoc" value="ok" class="mini primary">Create</button>
+    </div>
+  </form>
+</dialog>
+
+<input id="file" type="file" accept="image/*" hidden>
+<script src="app.js"></script>
+</body>
+</html>
