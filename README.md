@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="http://sgdev.is-cool.dev/assets/baner.png" alt="SGDEV Banner" />
+  <img src="https://sgdev.is-a.dev/assets/baner.png" alt="SGDEV Banner" />
 </div>
 
 <br>
@@ -7,7 +7,7 @@
 <table align="center">
   <tr>
     <td width="170" align="center" valign="middle">
-      <img width="140" alt="sg cool" src="http://sgdev.is-cool.dev/assets/sg.cool.png" />
+      <img width="140" alt="sg cool" src="https://sgdev.is-a.dev/assets/sg.cool.png" />
     </td>
     <td valign="middle">
       <h1>🚀 SGDEV Developer Portfolio<br>&amp; Technical Research Blog</h1>
@@ -87,5 +87,5 @@ This project uses a **dual-licensing structure** to preserve open-source integri
 ---
 
 <p align="center">
-  Made with ❤️ by <b>SGDEV</b> • <a href="https://sgdev.is-cool.dev">sgdev.is-cool.dev</a>
+  Made with ❤️ by <b>SGDEV</b> • <a href="https://sgdev.is-cool.dev"> <a href="https://sgdev.is-a.dev"> sgdev.is-cool.dev</a>
 </p>
