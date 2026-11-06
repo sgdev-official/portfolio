@@ -125,12 +125,12 @@
       "[y]Dev Tools[/] [d](live)[/]\nHandy developer utilities that run right in the browser.\n→  open devtools",
     "links/github.txt": "https://github.com/sgdev-official",
     "links/sourceforge.txt": "https://sourceforge.net/u/sgdev/profile/",
-    "links/blog.txt": "https://sgdev.qd.je/blog/"
+    "links/blog.txt": "/blog/"
   };
   var URLS = {
     github: "https://github.com/sgdev-official", sourceforge: "https://sourceforge.net/u/sgdev/profile/",
-    blog: "https://sgdev.qd.je/blog/", clock: "https://www.sgdev.qd.je/clock/",
-    devtools: "https://www.sgdev.is-cool.dev/devtools/", captcha: "https://scaptua.duckdns.org",
+    blog: "/blog/", clock: "/clock/",
+    devtools: "/devtools/", captcha: "https://scaptua.duckdns.org",
     sai: "https://sai-official.duckdns.org", mail: "mailto:info@sgdev.qd.je"
   };
   var cwd = "";

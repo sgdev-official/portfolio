@@ -21,4 +21,4 @@ jobs:
         run: npm install -g surge
 
       - name: Deploy to Surge
-        run: surge . www.sgdev.is-cool.dev --token "${{ secrets.SURGE_TOKEN }}"
+        run: surge . sgdev.is-cool.dev --token "${{ secrets.SURGE_TOKEN }}"
